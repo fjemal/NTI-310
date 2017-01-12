@@ -2,15 +2,15 @@ Welcome to the NTI-310 wiki!
 
 # BIND was originally created by the students of California University at Barkeley in the early 1980s
  
- The name originates as acronym of Barkeley Internet Name Domain.
+# The name originates as acronym of Barkeley Internet Name Domain.
 
 # Earlier version does not have a mechanism to strore and retrieve zone data except flat text files
 #security 
-security issues discverd in BIND9 are patched and publically disclosed
+#security issues discverd in BIND9 are patched and publically disclosed
 
-the letest BIND9 version was developed by Nominum
+#the letest BIND9 version was developed by Nominum
  http://www.linuxfromscratch.org/blfs/view/cvs/server/bind.html 
 
-it stands for Berkeley Internet Name Domain (BIND),it's the reference implementation of the Domain Name System (DNS) protocols It is a popular software for translating domain names into IP addresses for Linux servers it is a transparent open source software BIND is a very flexible, full-featured DNS system
+#it stands for Berkeley Internet Name Domain (BIND),it's the reference implementation of the Domain Name System (DNS) protocols It is a popular software for translating domain names into IP addresses for Linux servers it is a transparent open source software BIND is a very flexible, full-featured DNS system
 
 https://www.isc.org/downloads/bind/
