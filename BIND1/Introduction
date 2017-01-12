@@ -5,8 +5,10 @@ Welcome to the NTI-310 wiki!
  The name originates as acronym of Barkeley Internet Name Domain.
 
 # Earlier version does not have a mechanism to strore and retrieve zone data except flat text files
+#security 
+security issues discverd in BIND9 are patched and publically disclosed
 
-
+the letest BIND9 version was developed by Nominum
  http://www.linuxfromscratch.org/blfs/view/cvs/server/bind.html 
 
 it stands for Berkeley Internet Name Domain (BIND),it's the reference implementation of the Domain Name System (DNS) protocols It is a popular software for translating domain names into IP addresses for Linux servers it is a transparent open source software BIND is a very flexible, full-featured DNS system
