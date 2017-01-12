@@ -1,0 +1,7 @@
+Welcome to the NTI-310 wiki!
+
+http://www.linuxfromscratch.org/blfs/view/cvs/server/bind.html BIND was originally created by the students of California University at Barkeley in the early 1980s
+
+it stands for Berkeley Internet Name Domain (BIND),it's the reference implementation of the Domain Name System (DNS) protocols It is a popular software for translating domain names into IP addresses for Linux servers it is a transparent open source software BIND is a very flexible, full-featured DNS system
+
+https://www.isc.org/downloads/bind/
