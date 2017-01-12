@@ -1,10 +1,11 @@
 
-An important part of managing server configuration and infrastructure includes maintaining an easy way to look up network, IP address, by setting up DNS
+# An important part of managing server configuration and infrastructure includes maintaining an easy way to look up network, IP address, by setting up DNS
 
-how to setup internal DNS server, using BIND name server software (BIND9) on Ubuntus14.04
+# how to setup internal DNS server, using BIND name server software (BIND9) on Ubuntus14.04
 
 "https://www.digitalocean.com/community/tutorials/how-to-configure-bind-as-a-private-network-dns-server-on-ubuntu-14-04"
 
 (VPS) that can be used by Virtual Private Server(VPS)
 
 How to configure BIND as and Authoritative-Only DNS Server on Ubuntu 14.04 "https://www.digitalocean.com/community/tutorials/how-to-configure-bind-as-an-authoritative-only-dns-server-on-ubuntu-14-04"
+# sudo apt-get install bind9
