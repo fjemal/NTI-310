@@ -41,11 +41,62 @@ New password:
 Re-enter new password:
 {SSHA}xxxxxxxxxxxxxxxxxxxxxxxx
 
+#create basedomain.ldif file
+[root@ldap-b ~]# vi basedomain.ldif
+# replace to your own domain name for "dc=***,dc=***" section
+dn: dc=ldap-b,dc=com
+objectClass: top
+objectClass: dcObject
+objectclass: organization
+o: ldap-b com
+dc: ldap-b
 
+dn: cn=Manager,dc=ldap-b,dc=com
+objectClass: organizationalRole
+cn: Manager
+description: Directory Manager
 
-vi basedomain.ldif
+dn: ou=Users,dc=ldap-b,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Group,dc=ldap-b,dc=com
+objectClass: organizationalUnit
+ou: Group
+
+#dn: ou=Group,dc=ldap-b,dc=com
+#objectClass: organizationalUnit
+#ou: Group
+#create chdomain.ldif file
 vi chdomain.ldif
-vi chroopw.ldif
+# replace to your own domain name for "dc=***,dc=***" section
+# specify the password generated above for "olcRootPW" section
+ dn: olcDatabase={1}monitor,cn=config
+changetype: modify
+replace: olcAccess
+olcAccess: {0}to * by dn.base="gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth"
+  read by dn.base="cn=Manager,dc=ldap-b,dc=com" read by * none
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcSuffix
+olcSuffix: dc=ldap-b,dc=com
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootDN
+olcRootDN: cn=Manager,dc=ldap-b,dc=com
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+add: olcRootPW
+olcRootPW: {SSHA}JaNViUze7Y2d9AdRkxLn7MxkCsvUgaOF
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+add: olcAccess
+olcAccess: {0}to attrs=userPassword,shadowLastChange by
+"chdomain.ldif" 33L, 1106C
 
 # specify the password generated above for "olcRootPW" section
 [root@ldap-b ~]# vi chrootpw.ldif
@@ -171,17 +222,19 @@ modifying entry "cn=config"
 
 modifying entry "cn=config"
 #Add users and groups
-root@ldap-b ~} # useradd ldapuser
+[root@ldap-b ~] # useradd ldapuser1
 [root@ldap-server migrationtools} # useradd ldapuser2
-root@ldap-b ~} # useradd ldapuser1
-root@ldap-b ~} # useradd ldapuser2
-root@ldap-b ~} # grep root /etc/passwd > /etc/openldap/passwd.root
-root@ldap-b ~}# grep user1 /etc/passwd > /etc/openldap/passwd.user1
-root@ldap-b ~}]# grep user2 /etc/passwd > /etc/openldap/passwd.user2
+[root@ldap-b ~] # useradd ldapuser1
+[root@ldap-b ~] # useradd ldapuser2
+[root@ldap-b ~] # grep root /etc/passwd > /etc/openldap/passwd.root
+[root@ldap-b ~]# grep user1 /etc/passwd > /etc/openldap/passwd.user1
+[root@ldap-b ~]]# grep user2 /etc/passwd > /etc/openldap/passwd.user2
+#Filter out user group from /etc/group to another file:
+[root@ldap-b ~# grep ":10[0-9][0-9]" /etc/group > /root/group
 #Import Users in to the LDAP Database
-root@ldap-b ~}# ldapadd -x -W -D "cn=Manager,dc=ldap-b,dc=com" -f /root/base.ldif
-root@ldap-b ~}# ldapadd -x -W -D "cn=Manager,dc=ldap-b,dc=com" -f /root/users.ldif
-root@ldap-b ~}# ldapadd -x -W -D "cn=Manager,dc=ldap-b,dc=com" -f /root/groups.ldif
+[root@ldap-b ~]# ldapadd -x -W -D "cn=Manager,dc=ldap-b,dc=com" -f /root/base.ldif
+[root@ldap-b ~]# ldapadd -x -W -D "cn=Manager,dc=ldap-b,dc=com" -f /root/users.ldif
+[root@ldap-b ~# ldapadd -x -W -D "cn=Manager,dc=ldap-b,dc=com" -f /root/groups.ldif
 
 
 #If Firewalld is running, allow LDAP service. LDAP uses 389/TCP.
@@ -196,6 +249,15 @@ success
 # line 397: uncomment, line 398: comment out
 $servers->setValue('login','attr','dn');
 // $servers->setValue('login','attr','uid');
+
+/* Enable anonymous bind login. */                                        <- Disable anonymous bind login and change true to false
+$servers->setValue('login','anon_bind',false);                
+
+/* Use customized page with prefix when available. */
+#  $servers->setValue('custom','pages_prefix','custom_');
+
+/* If you set this, then only these DNs are allowed to log in. This array can
+   contain individual users, groups or ldap search filter(s). Keep in 
 
 [root@ldap-b ~]# vi /etc/httpd/conf.d/phpldapadmin.conf
 Alias /phpldapadmin /usr/share/phpldapadmin/htdocs
