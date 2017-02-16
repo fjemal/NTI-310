@@ -1,0 +1,61 @@
+
+#install nfs server
+yum install nfs-utils
+mkdir /var/nfsshare
+chmod -R 777 /var/nfsshare/
+mkdir /var/config/
+chmod -R 777 /var/config
+#start and enable services
+systemctl enable rpcbind
+systemctl enable nfs-server
+systemctl enable nfs-lock
+systemctl enable nfs-idmap
+systemctl start rpcbind
+systemctl start nfs-server
+systemctl start nfs-lock
+systemctl start nfs-idmap
+#edit /etc/exports
+vi /etc/exports
+/var/nfsshare    10.128.0.5(rw,sync,no_root_squash)
+/var/config      10.128.0.5(rw,sync,no_root_squash)
+/home            10.128.0.5(rw,sync,no_root_squash)
+
+#start the NFS service 
+systemctl restart nfs-server
+#add the NFS service override in CentOS 7.0 firewall-cmd public zone service
+firewall-cmd --permanent --zone=public --add-service=nfs
+firewall-cmd --reload
+
+#install and config nfs client
+yum install nfs-client
+mkdir -p /mnt/nfs/home
+mkdir -p /mnt/nfs/var/nfsshare
+mkdir -p /mnt/nfs/var/config
+#Start the services and add them to boot menu
+systemctl enable rpcbind
+systemctl enable nfs-server
+systemctl enable nfs-lock
+systemctl enable nfs-idmap
+systemctl start rpcbind
+systemctl start nfs-server
+systemctl start nfs-lock
+systemctl start nfs-idmap
+mount -t nfs 10.128.0.4:/home /mnt/nfs/home/
+mount -t nfs 10.128.0.4:/var/nfsshare /mnt/nfs/var/nfsshare/
+mount -t nfs 10.128.0.4:/var/nfsshare /mnt/nfs/var/config/
+#check if connected  with nfs share
+df -kh
+[root@nfs-client ~]# df -kh
+Filesystem                Size  Used Avail Use% Mounted on
+/dev/sda1                  10G  1.4G  8.7G  14% /
+devtmpfs                  288M     0  288M   0% /dev
+tmpfs                     295M     0  295M   0% /dev/shm
+tmpfs                     295M  4.3M  291M   2% /run
+tmpfs                     295M     0  295M   0% /sys/fs/cgroup
+tmpfs                      59M     0   59M   0% /run/user/1003
+10.128.0.4:/home           10G  1.5G  8.6G  15% /mnt/nfs/home
+tmpfs                      59M     0   59M   0% /run/user/0
+10.128.0.4:/var/nfsshare   10G  1.5G  8.6G  15% /mnt/nfs/var/nfsshare
+10.128.0.4:/var/config     10G  1.5G  8.6G  15% /mnt/nfs/var/config
+
+
