@@ -1,61 +1,58 @@
 
-#install nfs server
-yum install nfs-utils
-mkdir /var/nfsshare
-chmod -R 777 /var/nfsshare/
-mkdir /var/config/
-chmod -R 777 /var/config
-#start and enable services
-systemctl enable rpcbind
+#!/bin/bash
+#install nfs, run as a root
+yum -y install nfs-utils
+
+start nfs server and services
+systemctl enable nfs-server.service
+systemctl start nfs-server.service
 systemctl enable nfs-server
 systemctl enable nfs-lock
-systemctl enable nfs-idmap
+systemctl enable nfs-idmapd
+systemctl enable rpcbind
 systemctl start rpcbind
-systemctl start nfs-server
 systemctl start nfs-lock
 systemctl start nfs-idmap
-#edit /etc/exports
-vi /etc/exports
-/var/nfsshare    10.128.0.5(rw,sync,no_root_squash)
-/var/config      10.128.0.5(rw,sync,no_root_squash)
-/home            10.128.0.5(rw,sync,no_root_squash)
 
-#start the NFS service 
+
+#make directories and ownership
+mkdir /var/dev
+chown nfs:nfs /var/dev
+chmod -R 777 /var/dev
+mkdir /var/config
+chown nfs:nfs /var/config
+chmod -R 777 /var/config
+
+# use internal IPs
+vi /etc/exports
+/home          *(rw,sync,no_root_squash,no_all_squash)  
+/var/dev       *(rw,sync,no_all_squash)
+/var/config    *(rw,sync,no_all_squash)     
+
+#make changes take effect
+exportfs -a
 systemctl restart nfs-server
-#add the NFS service override in CentOS 7.0 firewall-cmd public zone service
+#add the nfs service to override firewall-cmd
 firewall-cmd --permanent --zone=public --add-service=nfs
 firewall-cmd --reload
 
-#install and config nfs client
-yum install nfs-client
-mkdir -p /mnt/nfs/home
-mkdir -p /mnt/nfs/var/nfsshare
-mkdir -p /mnt/nfs/var/config
-#Start the services and add them to boot menu
-systemctl enable rpcbind
-systemctl enable nfs-server
-systemctl enable nfs-lock
-systemctl enable nfs-idmap
-systemctl start rpcbind
-systemctl start nfs-server
-systemctl start nfs-lock
-systemctl start nfs-idmap
-mount -t nfs 10.128.0.4:/home /mnt/nfs/home/
-mount -t nfs 10.128.0.4:/var/nfsshare /mnt/nfs/var/nfsshare/
-mount -t nfs 10.128.0.4:/var/nfsshare /mnt/nfs/var/config/
-#check if connected  with nfs share
-df -kh
-[root@nfs-client ~]# df -kh
-Filesystem                Size  Used Avail Use% Mounted on
-/dev/sda1                  10G  1.4G  8.7G  14% /
-devtmpfs                  288M     0  288M   0% /dev
-tmpfs                     295M     0  295M   0% /dev/shm
-tmpfs                     295M  4.3M  291M   2% /run
-tmpfs                     295M     0  295M   0% /sys/fs/cgroup
-tmpfs                      59M     0   59M   0% /run/user/1003
-10.128.0.4:/home           10G  1.5G  8.6G  15% /mnt/nfs/home
-tmpfs                      59M     0   59M   0% /run/user/0
-10.128.0.4:/var/nfsshare   10G  1.5G  8.6G  15% /mnt/nfs/var/nfsshare
-10.128.0.4:/var/config     10G  1.5G  8.6G  15% /mnt/nfs/var/config
+#automount from home dir when user logged in
+yum -y install autofs
+#edit automaster
+
+vi /etc/auto.master >>> replace with /etc/auto.home
+vi /etc/auto.home 
+/""  /etc/auto.home  --timeout=60 #nfs share will umount after 60sec if no activity.
+
+#create a file at auto.home
+touch /etc/auto.home
+chmod 777 /etc/auto.home 
+#echo "*      *:/exports/home/&" >> /etc/auto.home
+systemctl start autofs.service
+systemctl enable autofs.service
+
+#To secure nfs server the administrator allow read-only access or squash user permission to a common user and group ID.
+
+
 
 
