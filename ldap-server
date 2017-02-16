@@ -1,0 +1,277 @@
+
+
+
+
+#!/bin/bash
+#Installing ldap server
+#https://www.server-world.info/en/note?os=CentOS_7&p=openldap
+#This is a basis for students to create a fully functioning build, compile, and deploy script.
+
+ yum -y install openldap compat-openldap openldap-clients openldap-serve openldap-servers-sql openldap-devel
+
+
+cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG 
+chown ldap. /var/lib/ldap/DB_CONFIG
+
+# some source editing
+# Tell SE linux what's going on, so that it doesn't freek
+
+##setsebool -P httpd_can_connect_ldap on
+#install and enable apache server
+yum -y install httpd
+systemctl enable httpd
+systemctl start httpd
+
+
+#sed -i 's,Require local,#Require local\n    Require all granted,g' /etc/httpd/conf.d/phpldapadmin.conf
+# decent config guide: http://www.itzgeek.com/how-tos/linux/centos-how-tos/install-configure-phpldapadmin-centos-7-ubuntu-16-04.html
+#Note: LDAP comes up completely insecure, with Anonymous login enabled by default... this is not a good and happy thing, so fix 
+#it in the config file
+#(prompt for user input), the following is currently a manual config, but could be automated fairly easily
+#slappasswd
+ 
+#start slapd service 
+systemctl start slapd.service 
+systemctl enable slapd.service 
+
+echo "generating ldap passowrd"
+newsecret=$(slappasswd -g)
+newhash=$(slappassed -s "$newsecret")
+echo -n "$newsecret" > /root/ldap_admin_pass
+chmod 600 /root/ldap_admin_pass
+
+echo "add db.ldif to ldap configuration"
+
+ dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcSuffix
+olcSuffix: dc=ldap,dc=local
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootDN
+olcRootDN: cn=ldapadm,dc=ldap,dc=local
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootPW
+olcRootPW: $newhash >> /etc/openldap/slapd.d/db.ldif
+
+[root@ldap-server ~]# yum -y install openldap compat-openldap openldap-clients openldap-servers openldap-servers-sql openldap-devel
+[root@ldap-server ~]# systemctl start slapd.service
+[root@ldap-server ~]# systemctl enable slapd.service
+
+Setup LDAP root password:
+[root@ldap-server ~]# slappasswd
+New password:
+Re-enter new password:
+{SSHA}nM83vpmMUSTdkaNsLtId2ZwgzZFKdXOP
+[root@ldap-server ~]#
+Configure OpenLDAP server:
+# vi db.ldif
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcSuffix
+olcSuffix: dc=ldap,dc=local
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootDN
+olcRootDN: cn=ldapadm,dc=ldap,dc=local
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootPW
+olcRootPW: {SSHA}nM83vpmMUSTdkaNsLtId2ZwgzZFKdXOP
+Once you are done with the ldif file, send the configuration to the LDAP server.
+
+[root@ldap-server ~]# ldapmodify -Y EXTERNAL  -H ldapi:/// -f db.ldif
+SASL/EXTERNAL authentication started
+SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+SASL SSF: 0
+modifying entry "olcDatabase={2}hdb,cn=config"
+
+modifying entry "olcDatabase={2}hdb,cn=config"
+
+modifying entry "olcDatabase={2}hdb,cn=config"
+# vi monitor.ldif
+
+dn: olcDatabase={1}monitor,cn=config
+changetype: modify
+replace: olcAccess
+olcAccess: {0}to * by dn.base="gidNumber=0+uidNumber=0,cn=peercred,cn=external, cn=auth" read by dn.base="cn=ldapadm,dc=ldap,dc=local" read by * none
+#Once you have updated the file, send the configuration to the LDAP server
+[root@ldap-server ~]# ldapmodify -Y EXTERNAL  -H ldapi:/// -f monitor.ldif
+SASL/EXTERNAL authentication started
+SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+SASL SSF: 0
+modifying entry "olcDatabase={1}monitor,cn=config"
+#Create LDAP certificate:
+[root@ldap-server ~]# openssl req -new -x509 -nodes -out /etc/op                                                                                             enldap/certs/itzgeekldapcert.pem -keyout /etc/openldap/certs/itz                                                                                             geekldapkey.pem -days 365
+Generating a 2048 bit RSA private key
+......+++
+..................+++
+writing new private key to '/etc/openldap/certs/itzgeekldapkey.p                                                                                             em'
+-----
+You are about to be asked to enter information that will be inco                                                                                             rporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Na                                                                                             me or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [XX]:^C
+[root@ldap-server ~]# openssl req -new -x509 -nodes -out /etc/op                                                                                             enldap/certs/ldapldapcert.pem -keyout /etc/openldap/certs/ldapld                                                                                             apkey.pem -days 365
+Generating a 2048 bit RSA private key
+................................................................                                                                                             ................................................................                                                                                             .............................................................+++
+................................................................                                                                                             ..................+++
+writing new private key to '/etc/openldap/certs/ldapldapkey.pem'
+-----
+You are about to be asked to enter information that will be inco                                                                                             rporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Na                                                                                             me or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [XX]:US
+State or Province Name (full name) []:WA
+Locality Name (eg, city) [Default City]:Seattle
+Organization Name (eg, company) [Default Company Ltd]:
+Organizational Unit Name (eg, section) []:NTI310
+Common Name (eg, your name or your server's hostname) []:ldap
+Email Address []:fjemal01@seattlecentral.edu
+Set the owner and group permissions to ldap.
+[root@ldap-server ~]# chown -R ldap:ldap /etc/openldap/certs/*.pem
+#Verify the created LDAP certificate under /etc/openldap/certs/.
+
+[root@ldap-server ~]# ll /etc/openldap/certs/*.pem
+[root@ldap-server ~]# ll /etc/openldap/certs/*.pem
+-rw-r--r--. 1 ldap ldap 1448 Feb  9 05:45 /etc/openldap/certs/ldapldapcert.pem
+-rw-r--r--. 1 ldap ldap 1704 Feb  9 05:45 /etc/openldap/certs/ldpldapkey.pem
+                     
+#Create certs.ldif file to configure LDAP to use secure communication using a self-signed certificate.
+
+# vi certs.ldif
+
+dn: cn=config
+changetype: modify
+replace: olcTLSCertificateFile
+olcTLSCertificateFile: /etc/openldap/certs/ldapldapcert.pem
+
+dn: cn=config
+changetype: modify
+replace: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /etc/openldap/certs/ldapldapkey.pem
+#Import the configurations to LDAP server.
+
+[root@ldap-server ~]# ldapmodify -Y EXTERNAL  -H ldapi:/// -f certs.ldif
+SASL/EXTERNAL authentication started
+SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+SASL SSF: 0
+modifying entry "cn=config"
+
+modifying entry "cn=config"
+#Verify the configuration
+[root@ldap-server ~]# slaptest -u
+config file testing succeeded
+#Set up LDAP database:
+[root@ldap-server ~]# cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
+[root@ldap-server ~]# chown ldap:ldap /var/lib/ldap/*
+#Add schemas
+[root@ldap-server ~]# ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
+SASL/EXTERNAL authentication started
+SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+SASL SSF: 0
+adding new entry "cn=cosine,cn=schema,cn=config"
+[root@ldap-server ~]# ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
+SASL/EXTERNAL authentication started
+SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+SASL SSF: 0
+adding new entry "cn=nis,cn=schema,cn=config"
+
+[root@ldap-server ~]# ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
+SASL/EXTERNAL authentication started
+SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+SASL SSF: 0
+adding new entry "cn=inetorgperson,cn=schema,cn=config"
+#Generate base.ldif file for your domain.
+
+# vi base.ldif
+
+dn: dc=ldap,dc=local
+dc: ldap
+objectClass: top
+objectClass: domain
+
+dn: cn=ldapadm ,dc=ldap,dc=local
+objectClass: organizationalRole
+cn: ldapadm
+description: LDAP Manager
+
+dn: ou=People,dc=ldap,dc=local
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Group,dc=ldap,dc=local
+objectClass: organizationalUnit
+ou: Group
+#Build the directory structure.
+ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif
+[root@ldap-server ~]# ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif
+Enter LDAP Password:
+adding new entry "dc=ldap,dc=local"
+
+adding new entry "cn=ldapadm ,dc=ldap,dc=local"
+
+adding new entry "ou=People,dc=ldap,dc=local"
+
+adding new entry "ou=Group,dc=ldap,dc=local"
+
+***********phpldapadmin*********
+[root@ldap-server ~]#  yum -y install epel-release
+[root@ldap-server ~]# yum install -y phpldapadmin
+#Configure Apache virtual host on CentOS 7 / RHEL 7
+
+#
+#  Web-based tool for managing LDAP servers
+#
+
+Alias /phpldapadmin /usr/share/phpldapadmin/htdocs
+Alias /ldapadmin /usr/share/phpldapadmin/htdocs
+
+<Directory /usr/share/phpldapadmin/htdocs>
+  <IfModule mod_authz_core.c>
+    # Apache 2.4
+   # Require local
+  Require all granted                add this line
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    # Apache 2.2
+    Order Deny,Allow
+    Deny from all
+    Allow from 127.0.0.1
+    Allow from ::1
+  </IfModule>
+</Directory>
+
+[root@ldap-server ~]# systemctl restart httpd.service
+[root@ldap-server ~]# firewall-cmd --permanent --zone=public --add-service=http
+[root@ldap-server ~]# firewall-cmd --reload
+success
+#Configure phpLDAPAdmin
+vi /etc/phpldapadmin/config.php
+$servers->setValue('server','name','ldap local LDAP Server');
+// $servers->setValue('server','host','127.0.0.1');
+ $servers->setValue('login','attr','dn');>>>>>>>>>>>>>>uncomment
+//$servers->setValue('login','attr','uid');>>>>>>>>>>>>comment out
+
+ $servers->setValue('server','base',array('dc=ldap,dc=local'));
+
+#Bellow command can fix phpldapadmin login problems
+setsebool -P httpd_can_connect_ldap on
+ 
+
+
+
