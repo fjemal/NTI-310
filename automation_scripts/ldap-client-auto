@@ -1,0 +1,132 @@
+#This is ldap-client automation script
+#Install the necessary LDAP client packages.
+#update the client server
+sudo apt-get update
+sudo apt-get -y install libnss-ldap libpam-ldap ldap-utils nscd
+#set the ubuntu environment variables DEBIAN_FRONTEND TO noninteractive
+export DEBIAN_FRONTEND=noninteractive
+unset DEBIAN_FRONTEND
+
+#echo "cloning fjemal01's NTI-310 GitHub..."
+git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
+git config --global user.name "fjemal"
+git config --global user.email "fjemal01@seattlecentral.edu"
+
+cp /tmp/NTI-310/config-files/ldap.conf /etc/ldap.conf
+
+#configure ldap client
+
+#use sed to add config lines to /etc/ldap.conf
+sed -i 's,base dc=example\,dc=net,base dc=ldap\,dc=local,g' /etc/ldap.conf
+sed -i 's,uri ldapi:///,uri ldap://104.198.163.240/,g' /etc/ldap.conf
+sed -i 's,ldap_version 3,g' /etc/ldap.conf
+sed -i 's,pam_password md5,g' /etc/ldap.conf
+#ldap://Server-IP-address #change lpdapi:/// to ldap:// 
+#use ldap version 3
+# dc=ldap,dc=local
+#cn=ldapadm,dc=ldap,dc=local
+
+
+#Configure authentication:
+ /etc/nsswitch.conf
+#
+# Example configuration of GNU Name Service Switch functionality.
+# If you have the `glibc-doc-reference' and `info' packages installed, try:
+# `info libc "Name Service Switch"' for information about this file.
+
+vi /etc/nsswitch.conf  >>>>>>>>>>user stream edetor "sed"
+
+sed -i 's,passwd:         compat,passwd:         ldap compat,g' /etc/nsswitch.conf
+sed -i 's,group:          compat,group:          ldap compat,g' /etc/nsswitch.conf
+sed -i 's,shadow:         compat,shadow:         ldap compat,g' /etc/nsswitch.conf
+#passwd:         ldap compat
+#group:          ldap compat
+#shadow:         ldap compat
+
+
+
+#hosts:          files resolve [!UNAVAIL=return] dns
+#networks:       files
+
+#protocols:      db files
+#services:       db files
+
+#ethers:         db files
+#rpc:            db files
+
+#netgroup:       nis
+
+#edit pam.d 
+#vi /etc/pam.d/common-session
+
+#add following line at the bottom: 
+sed -i '$ a\session required    pam_mkhomedir.so skel=/etc/skel umask=0077' /etc/pam.d/common-session
+#restart the service
+/etc/init.d/nscd restart
+#[ ok ] Restarting nscd (via systemctl): nscd.service.
+#edit the sudoers
+# This file MUST be edited with the 'visudo' command as root.
+#
+# Please consider adding local content in /etc/sudoers.d/ instead$
+# directly modifying this file.
+#
+# See the man page for details on how to write a sudoers file.
+#
+#Defaults        env_reset
+#Defaults        mail_badpass
+#Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/$
+
+# Host alias specification
+
+# User alias specification
+
+# Cmnd alias specification
+
+# User privilege specification
+root    ALL=(ALL:ALL) ALL
+
+# Members of the admin group may gain root privileges
+sed -i 's,#admin ALL=(ALL) ALL,g' /etc/sudoers                                           <<<<<<<<<commentout
+
+# Allow members of group sudo to execute any command
+%sudo   ALL=(ALL:ALL) ALL
+
+# See sudoers(5) for more information on "#include" directives:
+
+#includedir /etc/sudoers.d
+#edit sshd config
+cd /etc/ssh
+#if permission denied cp sshd_config sshd_config.bak
+#vi sshd_config
+
+#comment out 
+sed -i 's,PasswordAuthentication no,#PasswordAuthentication no,g' /etc/ssh/sshd_config
+#comment out 
+sed -i 's,ChallengeResponseAuthentication no,#ChallengeResponseAuthentication no,g' /etc/ssh/sshd_config
+
+#restart the sshd service
+systemctl restart sshd.service 
+
+#login in your phpldapadmin server and create user account
+
+
+#login as: 
+#[root@ldap-server ~]# ssh fjemal@10.128.0.3
+#Password:
+#Welcome to Ubuntu 16.10 (GNU/Linux 4.8.0-32-generic x86_64)
+
+ #* Documentation:  https://help.ubuntu.com
+# * Management:     https://landscape.canonical.com
+ #* Support:        https://ubuntu.com/advantage
+
+  #Get cloud support with Ubuntu Advantage Cloud Guest:
+    #http://www.ubuntu.com/business/services/cloud
+
+#37 packages can be updated.
+#0 updates are security updates.
+
+
+#*** System restart required ***
+#Last login: Wed Feb 15 22:08:16 2017 from 10.128.0.2
+#$
+
