@@ -264,6 +264,9 @@ $servers->setValue('server','name','ldap local LDAP Server');
 //$servers->setValue('login','attr','uid');>>>>>>>>>>>>comment out
 
  $servers->setValue('server','base',array('dc=ldap,dc=local'));
+ /* Enable anonymous bind login. */
+ $servers->setValue('login','anon_bind',false);      umcomment and channge true to false.
+
 
 #Bellow command can fix phpldapadmin login problems
 setsebool -P httpd_can_connect_ldap on
