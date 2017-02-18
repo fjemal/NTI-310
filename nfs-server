@@ -24,10 +24,10 @@ chown nfs:nfs /var/config
 chmod -R 777 /var/config
 
 # use internal IPs
-vi /etc/exports
-/home          *(rw,sync,no_root_squash,no_all_squash)  
+
+echo "/home          *(rw,sync,no_root_squash,no_all_squash)  
 /var/dev       *(rw,sync,no_all_squash)
-/var/config    *(rw,sync,no_all_squash)     
+/var/config    *(rw,sync,no_all_squash)" >> /etc/exports    
 
 #make changes take effect
 exportfs -a
@@ -36,23 +36,5 @@ systemctl restart nfs-server
 firewall-cmd --permanent --zone=public --add-service=nfs
 firewall-cmd --reload
 
-#automount from home dir when user logged in
-yum -y install autofs
-#edit automaster
-
-vi /etc/auto.master >>> replace with /etc/auto.home
-vi /etc/auto.home 
-/""  /etc/auto.home  --timeout=60 #nfs share will umount after 60sec if no activity.
-
-#create a file at auto.home
-touch /etc/auto.home
-chmod 777 /etc/auto.home 
-#echo "*      *:/exports/home/&" >> /etc/auto.home
-systemctl start autofs.service
-systemctl enable autofs.service
-
-#To secure nfs server the administrator allow read-only access or squash user permission to a common user and group ID.
-
-
-
-
+exports -a
+systemctl restart nfs-server
