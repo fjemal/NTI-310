@@ -1,5 +1,3 @@
-# vi base.ldif
-
 dn: dc=ldap,dc=local
 dc: ldap
 objectClass: top
