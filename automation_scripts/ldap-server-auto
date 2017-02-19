@@ -9,7 +9,7 @@ git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
 git config --global user.name "fjemal"
 git config --global user.email "fjemal01@seattlecentral.edu"
 ehco "copying config files"
-cp /tmp/NTI-310/config_scripts/ldap.conf /etc/ldap.conf
+#cp /tmp/NTI-310/config_scripts/ldap.conf /etc/ldap.conf
 #Installing ldap server
 #https://www.server-world.info/en/note?os=CentOS_7&p=openldap
 
