@@ -123,7 +123,7 @@ ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif
 echo "installing phpldadadmin"
 yum -y install epel-release
 yum install -y phpldapadmin
-cp /tmp/NTI-310/config_scrips/config.php /etc/phpldapadmin/config.php
+cp /tmp/NTI-310/config_scripts/config.php /etc/phpldapadmin/config.php
 sed -i 's,Require local,#Require local\n    Require all granted,g' /etc/httpd/conf.d/phpldapadmin.conf
 cp /tmp/NTI-310/config_scripts/phpldapadmin.conf /etc/httpd/conf.d/phpldapadmin.conf
 #restart httpd and slapd
