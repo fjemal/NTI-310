@@ -104,11 +104,11 @@ SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
 SASL SSF: 0
 modifying entry "olcDatabase={1}monitor,cn=config"
 #Create LDAP certificate:
-[root@ldap-server ~]# openssl req -new -x509 -nodes -out /etc/openldap/certs/fjemalldapcert.pem -keyout /etc/openldap/certs/fjemalldapkey.pem -days 365
+[root@ldap-server ~]# openssl req -new -x509 -nodes -out /etc/openldap/certs/ldapldapcert.pem -keyout /etc/openldap/certs/ldapldapkey.pem -days 365
 Generating a 2048 bit RSA private key
 ......+++
 ..................+++
-writing new private key to '/etc/openldap/certs/fjemalldapkey.p                                                                                             em'
+writing new private key to '/etc/openldap/certs/ldapldapkey.p                                                                                             em'
 -----
 You are about to be asked to enter information that will be inco                                                                                             rporated
 into your certificate request.
@@ -145,7 +145,7 @@ Set the owner and group permissions to ldap.
 [root@ldap-server ~]# ll /etc/openldap/certs/*.pem
 [root@ldap-server ~]# ll /etc/openldap/certs/*.pem
 -rw-r--r--. 1 ldap ldap 1448 Feb  9 05:45 /etc/openldap/certs/ldapldapcert.pem
--rw-r--r--. 1 ldap ldap 1704 Feb  9 05:45 /etc/openldap/certs/ldpldapkey.pem
+-rw-r--r--. 1 ldap ldap 1704 Feb  9 05:45 /etc/openldap/certs/ldapldapkey.pem
                      
 #Create certs.ldif file to configure LDAP to use secure communication using a self-signed certificate.
 
