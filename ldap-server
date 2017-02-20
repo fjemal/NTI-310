@@ -104,11 +104,11 @@ SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
 SASL SSF: 0
 modifying entry "olcDatabase={1}monitor,cn=config"
 #Create LDAP certificate:
-[root@ldap-server ~]# openssl req -new -x509 -nodes -out /etc/op                                                                                             enldap/certs/itzgeekldapcert.pem -keyout /etc/openldap/certs/itz                                                                                             geekldapkey.pem -days 365
+[root@ldap-server ~]# openssl req -new -x509 -nodes -out /etc/openldap/certs/fjemalldapcert.pem -keyout /etc/openldap/certs/fjemalldapkey.pem -days 365
 Generating a 2048 bit RSA private key
 ......+++
 ..................+++
-writing new private key to '/etc/openldap/certs/itzgeekldapkey.p                                                                                             em'
+writing new private key to '/etc/openldap/certs/fjemalldapkey.p                                                                                             em'
 -----
 You are about to be asked to enter information that will be inco                                                                                             rporated
 into your certificate request.
