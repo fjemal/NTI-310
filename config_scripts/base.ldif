@@ -8,13 +8,6 @@ objectClass: organizationalRole
 cn: ldapadm
 description: LDAP Manager
 
-dn: ou=fadil,dc=ldap,dc=local
-objectClass:organizationalUnit
-ou:people
-dn: ou=jj,cd=ldap,dc=local
-objectClass:organizationalUnit
-ou:people
-
 dn: ou=People,dc=ldap,dc=local
 objectClass: organizationalUnit
 ou: People
