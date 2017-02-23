@@ -232,7 +232,7 @@ adding new entry "ou=Group,dc=ldap,dc=local"
 
 #
 #  Web-based tool for managing LDAP servers
-#
+#edit/etc/phpldapadmin/config.php
 
 Alias /phpldapadmin /usr/share/phpldapadmin/htdocs
 Alias /ldapadmin /usr/share/phpldapadmin/htdocs
