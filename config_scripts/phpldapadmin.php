@@ -1,4 +1,4 @@
-#
+#vi /etc/httpd/conf.d/phpldapadmin.conf
 #  Web-based tool for managing LDAP servers
 #
 
