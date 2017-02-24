@@ -68,7 +68,8 @@ echo 'dn: olcDatabase={1}monitor,cn=config
 changetype: modify
 replace: olcAccess
 olcAccess: {0}to * by dn.base="gidNumber=0+uidNumber=0,cn=peercred,cn=external, cn=auth" read by dn.base="cn=ldapadm,dc=ldap,dc=local" read by * none' > monitor.ldif
-ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
+ldapmodify -Y EXTERNAL  -H ldapi:/// -f monitor.ldif
+#ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
 
 
 
@@ -84,8 +85,8 @@ chown ldap. /etc/openldap/slapd.d/monitor.ldif
 #ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
 #Create LDAP certificate
 openssl req -new -x509 -nodes -out /etc/openldap/certs/fjldapcert.pem -keyout /etc/openldap/certs/fjldapkey.pem -days 365 -subj "/C=US/ST=WA/L=Seattle/O=SCC/OU=IT/CN=ldap.local"
-chown -R ldap. /etc/openldap/certs/fjldapcert.pem
-chown -R ldap. /etc/openldap/certs/fjldapkey.pem
+chown -R ldap. /etc/openldap/certs/*.pem
+#chown -R ldap. /etc/openldap/certs/fjldapkey.pem
 echo "dn: cn=config
 changetype: modify
 replace: olcTLSCertificateFile
@@ -139,6 +140,9 @@ echo "adding base.ldif to ldap server
 
 ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif -y /root/ldap_admin_pass
 #ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f /etc/openldap/slapd.d/base.ldif -y /root/ldap_admin_pass
+#allow firewall
+firewall-cmd --permanent --zone=public --add-service=http
+firewall-cmd --reload
 
 echo "installing phpldadadmin"
 yum -y install epel-release
