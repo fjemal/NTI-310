@@ -5,10 +5,9 @@ echo "installing git"
 yum -y install git
 echo "clonig git"
 echo "cloning fjemal's NTI-310 GitHub..."
-git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
+git clone https://github.com/fjemal/NTI-310.git 
 git config --global user.name "fjemal"
 git config --global user.email "fjemal01@seattlecentral.edu"
-ehco "copying config files"
 #Installing ldap server
 #https://www.server-world.info/en/note?os=CentOS_7&p=openldap
 
@@ -21,16 +20,15 @@ echo "copying config files"
 cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG 
 chown ldap. /var/lib/ldap/DB_CONFIG
 
-# some source editing
 # Tell SE linux what's going on, so that it doesn't freek
+setsebool -P httpd_can_connect_ldap on
+systemctl enable slapd
+systemctl start slapd
 
 echo "installing and enabling apache server"
 yum -y install httpd
 systemctl enable httpd
 systemctl start httpd
-echo "allowing ldap to httpd"
-setsebool -P httpd_can_connect_ldap on
-
 
 # decent config guide: http://www.itzgeek.com/how-tos/linux/centos-how-tos/install-configure-phpldapadmin-centos-7-ubuntu-16-04.html
 #Note: LDAP comes up completely insecure, with Anonymous login enabled by default... this is not a good and happy thing, so fix 
@@ -41,17 +39,16 @@ echo "start slapd service"
 systemctl start slapd.service 
 systemctl enable slapd.service 
 
-echo "generating ldap passowrd"
+echo "generating ldap slappasswrd"
 newsecret=$(slappasswd -g)
 newhash=$(slappasswd -s "$newsecret")
 echo -n "$newsecret" > /root/ldap_admin_pass
+chmod 0600 /root/ldap_admin_pass
 
-
-chmod 600 /root/ldap_admin_pass
-cp /tmp/NTI-310/config_scripts/db.ldif /etc/openldap/slapd.d/db.ldif
+chown ldap: /etc/openldap/slapd.d/db.ldif
 echo "add db.ldif to ldap configuration"
 
- dn: olcDatabase={2}hdb,cn=config
+ echo "dn: olcDatabase={2}hdb,cn=config
 changetype: modify
 replace: olcSuffix
 olcSuffix: dc=ldap,dc=local
@@ -64,8 +61,16 @@ olcRootDN: cn=ldapadm,dc=ldap,dc=local
 dn: olcDatabase={2}hdb,cn=config
 changetype: modify
 replace: olcRootPW
-olcRootPW: $newhash >> /etc/openldap/slapd.d/db.ldif
+olcRootPW: $newhash" >> /etc/openldap/slapd.d/db.ldif
 ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/db.ldif
+#restrict monitor users
+echo 'dn: olcDatabase={1}monitor,cn=config
+changetype: modify
+replace: olcAccess
+olcAccess: {0}to * by dn.base="gidNumber=0+uidNumber=0,cn=peercred,cn=external, cn=auth" read by dn.base="cn=ldapadm,dc=ldap,dc=local" read by * none' > monitor.ldif
+ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
+
+
 
 systemctl start slapd.service
 systemctl enable slapd.service
@@ -77,30 +82,40 @@ echo "copying monitor.ldif to ldap server"
 cp /tmp/NTI-310/config_scripts/monitor.ldif /etc/openldap/slapd.d/monitor.ldif
 chown ldap. /etc/openldap/slapd.d/monitor.ldif
 ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
+#Create LDAP certificate
+openssl req -new -x509 -nodes -out /etc/openldap/certs/fjldapcert.pem -keyout /etc/openldap/certs/fjldapkey.pem -days 365 -subj "/C=US/ST=WA/L=Seattle/O=SCC/OU=IT/CN=ldap.local"
+chown -R ldap. /etc/openldap/certs/fjldapcert.pem
+chown -R ldap. /etc/openldap/certs/fjldapkey.pem
+echo "dn: cn=config
+changetype: modify
+replace: olcTLSCertificateFile
+olcTLSCertificateFile: /etc/openldap/certs/fjldapcert.pem
 
+dn: cn=config
+changetype: modify
+replace: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /etc/openldap/certs/fjldapkey.pem" > certs.ldif
 
+ldapmodify -Y EXTERNAL  -H ldapi:/// -f certs.ldif
+chown ldap: /etc/openldap/certs.ldif
+# Test cert configuration
 
-#Create LDAP certificate:
-echo "Copying cert.ldif"
-cp /tmp/NTI-310/config_scripts/certs.ldif /etc/openldap/slapd.d/certs.ldif
-ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/certs.ldif
+slaptest -u
 
+unalias cp
+#Set up LDAP database
+cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
+chown ldap:ldap /var/lib/ldap/*
 echo "Adding schemas"
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
 
-
-#Set up LDAP database:
-# cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
-# chown ldap:ldap /var/lib/ldap/*
-
 echo "adding new entry cn=inetorgperson,cn=schema,cn=config"
 echo"Generating base.ldif file for your domain"
-cp /tmp/NTI-310/config_scripts/base.ldif /etc/openldap/slapd.d/base.ldif
-ldapadd -x -D "cn=ldapadm,dc=ldap,dc=local" -f /etc/openldap/slapd.d/base.ldif -y /root/ldap_admin_pass
 
-dn: dc=ldap,dc=local
+#chown ldap: /etc/openldap/slapd.d/base.ldif
+echo "dn: dc=ldap,dc=local
 dc: ldap
 objectClass: top
 objectClass: domain
@@ -113,28 +128,17 @@ description: LDAP Manager
 dn: ou=People,dc=ldap,dc=local
 objectClass: organizationalUnit
 ou: People
-
 dn: ou=Group,dc=ldap,dc=local
 objectClass: organizationalUnit
-ou: Group
+ou: Group" > base.ldif
 #Build the directory structure.
-ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif
+ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif -y /root/ldap_admin_pass
+#ldapadd -x -D "cn=ldapadm,dc=ldap,dc=local" -f /etc/openldap/slapd.d/base.ldif -y /root/ldap_admin_pass
 
 echo "installing phpldadadmin"
 yum -y install epel-release
 yum install -y phpldapadmin
-
 sed -i 's,Require local,#Require local\n    Require all granted,g' /etc/httpd/conf.d/phpldapadmin.conf
-cp /tmp/NTI-310/config_scripts/config.php /etc/phpldapadmin/config.php
-#restart httpd and slapd
-systemctl restart httpd
-systemctl restart slapd.service
-#allow firewall
-firewall-cmd --permanent --zone=public --add-service=http
-firewall-cmd --reload
+chown ldap:apache /etc/phpldapadmin/config.php
 
-
-#  Web-based tool for managing LDAP servers
-#
-
-
+systemctl restart httpd.service
