@@ -12,3 +12,4 @@ ou: People
 dn: ou=Group,dc=ldap,dc=local
 objectClass: organizationalUnit
 ou: Group
+#
