@@ -115,23 +115,26 @@ echo "adding new entry cn=inetorgperson,cn=schema,cn=config"
 #generating base.ldif file for your domain
 
 #chown ldap: /etc/openldap/slapd.d/base.ldif
-echo "dn: dc=ldap,dc=local
-dc: ldap
-objectClass: top
-objectClass: domain
+#echo "dn: dc=ldap,dc=local
+#dc: ldap
+#objectClass: top
+#objectClass: domain
 
-dn: cn=ldapadm ,dc=ldap,dc=local
-objectClass: organizationalRole
-cn: ldapadm
-description: LDAP Manager
+#dn: cn=ldapadm ,dc=ldap,dc=local
+#objectClass: organizationalRole
+#cn: ldapadm
+#description: LDAP Manager
 
-dn: ou=People,dc=ldap,dc=local
-objectClass: organizationalUnit
-ou: People
-dn: ou=Group,dc=ldap,dc=local
-objectClass: organizationalUnit
-ou: Group" > base.ldif
+#dn: ou=People,dc=ldap,dc=local
+#objectClass: organizationalUnit
+#ou: People
+#dn: ou=Group,dc=ldap,dc=local
+#objectClass: organizationalUnit
+#ou: Group" > base.ldif
 #Build the directory structure.
+echo "adding base.ldif to ldap server
+cp /tmp/NTI-310/config_scripts/base.ldif /etc/openldap/slapd.d/base.ldif
+
 ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif -y /root/ldap_admin_pass
 #ldapadd -x -D "cn=ldapadm,dc=ldap,dc=local" -f /etc/openldap/slapd.d/base.ldif -y /root/ldap_admin_pass
 
