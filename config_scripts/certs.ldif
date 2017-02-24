@@ -1,9 +1,8 @@
 dn: cn=config
 changetype: modify
 replace: olcTLSCertificateFile
-olcTLSCertificateFile: /etc/openldap/certs/ldapldapcert.pem
-
+olcTLSCertificateFile: /etc/openldap/certs/fjldapcert.pem
 dn: cn=config
 changetype: modify
 replace: olcTLSCertificateKeyFile
-olcTLSCertificateKeyFile: /etc/openldap/certs/ldapldapkey.pem
+olcTLSCertificateKeyFile: /etc/openldap/certs/fjldapkey.pem
