@@ -78,10 +78,10 @@ systemctl enable slapd.service
 #Once you are done with the ldif file, send the configuration to the LDAP server.
 
 # ldapmodify -Y EXTERNAL  -H ldapi:/// -f db.ldif
-echo "copying monitor.ldif to ldap server"
-cp /tmp/NTI-310/config_scripts/monitor.ldif /etc/openldap/slapd.d/monitor.ldif
+#echo "copying monitor.ldif to ldap server"
+#cp /tmp/NTI-310/config_scripts/monitor.ldif /etc/openldap/slapd.d/monitor.ldif
 chown ldap. /etc/openldap/slapd.d/monitor.ldif
-ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
+#ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
 #Create LDAP certificate
 openssl req -new -x509 -nodes -out /etc/openldap/certs/fjldapcert.pem -keyout /etc/openldap/certs/fjldapkey.pem -days 365 -subj "/C=US/ST=WA/L=Seattle/O=SCC/OU=IT/CN=ldap.local"
 chown -R ldap. /etc/openldap/certs/fjldapcert.pem
@@ -97,7 +97,7 @@ replace: olcTLSCertificateKeyFile
 olcTLSCertificateKeyFile: /etc/openldap/certs/fjldapkey.pem" > certs.ldif
 
 ldapmodify -Y EXTERNAL  -H ldapi:/// -f certs.ldif
-chown ldap: /etc/openldap/certs.ldif
+chown ldap: certs.ldif
 # Test cert configuration
 
 slaptest -u
@@ -112,7 +112,7 @@ ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
 
 echo "adding new entry cn=inetorgperson,cn=schema,cn=config"
-echo"Generating base.ldif file for your domain"
+#generating base.ldif file for your domain
 
 #chown ldap: /etc/openldap/slapd.d/base.ldif
 echo "dn: dc=ldap,dc=local
