@@ -61,8 +61,8 @@ olcRootDN: cn=ldapadm,dc=ldap,dc=local
 dn: olcDatabase={2}hdb,cn=config
 changetype: modify
 replace: olcRootPW
-olcRootPW: $newhash" >> /etc/openldap/slapd.d/db.ldif
-ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/db.ldif
+olcRootPW: $newhash" >> db.ldif
+ldapmodify -Y EXTERNAL  -H ldapi:/// -f db.ldif
 #restrict monitor users
 echo 'dn: olcDatabase={1}monitor,cn=config
 changetype: modify
