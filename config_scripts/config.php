@@ -1,3 +1,4 @@
+#vi /etc/phpldapadmin/config.php
 ?php
 /** NOTE **
  ** Make sure that <?php is the FIRST line of this file!
