@@ -196,7 +196,9 @@ sed -i 's/SLAPD_URLS="ldapi:\/\/\/ ldap:\/\/\/"/SLAPD_URLS=\"ldapi:\/\/\/ ldap:\
 
 #restart httpd and slapd
 
-
+echo "TLS_REQCERT allow" >> /etc/openldap/ldap.conf
+echo "tls_reqcert allow" >> /etc/nslcd.conf
+authconfig --enableldaptls --update 
 
 systemctl restart httpd
 systemctl restart slapd
