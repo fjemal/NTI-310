@@ -2,7 +2,7 @@
 #Install the necessary LDAP client packages.
 #update the client server
 sudo apt-get update
-sudo apt-get -y install libnss-ldap libpam-ldap ldap-utils nscd
+sudo apt-get -y install libnss-ldap libpam-ldap ldap-utils nscd nslcd
 #set the ubuntu environment variables DEBIAN_FRONTEND TO noninteractive
 export DEBIAN_FRONTEND=noninteractive
 unset DEBIAN_FRONTEND
@@ -86,7 +86,7 @@ sed -i '$ a\session required    pam_mkhomedir.so skel=/etc/skel umask=0077' /etc
 root    ALL=(ALL:ALL) ALL
 
 # Members of the admin group may gain root privileges
-sed -i 's,#admin ALL=(ALL) ALL,g' /etc/sudoers                                           <<<<<<<<<commentout
+sed -i 's,%admin=(ALL) ALL,#%admin ALL=(ALL) ALL,g' /etc/sudoers                                        #  <<<<<<<<<comment out
 
 # Allow members of group sudo to execute any command
 %sudo   ALL=(ALL:ALL) ALL
@@ -115,18 +115,5 @@ systemctl restart sshd.service
 #Password:
 #Welcome to Ubuntu 16.10 (GNU/Linux 4.8.0-32-generic x86_64)
 
- #* Documentation:  https://help.ubuntu.com
-# * Management:     https://landscape.canonical.com
- #* Support:        https://ubuntu.com/advantage
 
-  #Get cloud support with Ubuntu Advantage Cloud Guest:
-    #http://www.ubuntu.com/business/services/cloud
-
-#37 packages can be updated.
-#0 updates are security updates.
-
-
-#*** System restart required ***
-#Last login: Wed Feb 15 22:08:16 2017 from 10.128.0.2
-#$
 
