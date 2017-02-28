@@ -18,7 +18,9 @@ cp /tmp/NTI-310/config_scripts/ldap.conf /etc/ldap.conf
 
 #use sed to add config lines to /etc/ldap.conf
 sed -i 's,base dc=example\,dc=net,base dc=ldap\,dc=local,g' /etc/ldap.conf
-sed -i 's,uri ldapi:///,uri ldap://104.198.163.240/,g' /etc/ldap.conf
+sed -i 's,uri ldapi:///,uri ldap://10.128.0.2/,g' /etc/ldap.conf
+sed -i -e "s/pam_password md5/pam_password ssha/" /etc/ldap.conf
+sed -i 's,rootbinddn cn=ldapadm\,dc=example\,dc=net,#rootbinddn cn=manager\,dc=example\,dc=net,g' /etc/ldap.conf
 sed -i 's,ldap_version 3,g' /etc/ldap.conf
 sed -i 's,pam_password md5,g' /etc/ldap.conf
 #ldap://Server-IP-address #change lpdapi:/// to ldap:// 
