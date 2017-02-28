@@ -30,13 +30,13 @@ sed -i 's,pam_password md5,g' /etc/ldap.conf
 
 
 #Configure authentication:
- /etc/nsswitch.conf
+# /etc/nsswitch.conf
 #
 # Example configuration of GNU Name Service Switch functionality.
 # If you have the `glibc-doc-reference' and `info' packages installed, try:
 # `info libc "Name Service Switch"' for information about this file.
 
-vi /etc/nsswitch.conf  >>>>>>>>>>user stream edetor "sed"
+# vi /etc/nsswitch.conf  >>>>>>>>>>user stream edetor "sed"
 
 sed -i 's,passwd:         compat,passwd:         ldap compat,g' /etc/nsswitch.conf
 sed -i 's,group:          compat,group:          ldap compat,g' /etc/nsswitch.conf
