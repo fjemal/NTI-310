@@ -1,5 +1,8 @@
 #!/bin/bash
-
+#echo "cloning fjemal01's NTI-310 GitHub..."
+git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
+git config --global user.name "fjemal"
+git config --global user.email "fjemal01@seattlecentral.edu"
 echo "Current python version:"
 
 python --version
@@ -26,7 +29,7 @@ cd /opt
 # we want to make this env accisible to the ec2-user at first, because we don't want to have to run it as root.
 
 sudo mkdir django
-sudo chown -R ec2-user django
+sudo chown -R fadilj django
 
 sleep 5
 
@@ -43,7 +46,7 @@ echo "now using:"
 
 which python
 
-sudo chown -R ec2-user /opt/django
+sudo chown -R fadilj /opt/django
 
 echo "installing django"
  
@@ -61,3 +64,6 @@ echo "here's our new django project dir"
 tree project1
 
 echo "go to https://docs.djangoproject.com/en/1.10/intro/tutorial01/"
+
+
+
