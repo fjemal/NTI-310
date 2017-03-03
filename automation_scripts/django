@@ -60,10 +60,51 @@ django-admin --version
 django-admin startproject project1
 
 echo "here's our new django project dir"
-
+sudo yum -y install tree
 tree project1
 
 echo "go to https://docs.djangoproject.com/en/1.10/intro/tutorial01/"
 
+sudo pip install virtualenv
+
+#mkdir ~/project1
+#cd ~/project1
+#virtualenv myprojectenv
+#source myprojectenv/bin/activate
+
+sed -i "s,ALLOWED_HOSTS = \[\],ALLOWED_HOSTS = \['*'\],g" /opt/django/project1/project1/settings.py
+
+pip install django psycopg2
+django-admin.py startproject project1 .
+#edit the following files~/project1/project1/settings.py
+
+#DATABASES = {
+ #   'default': {
+  #      'ENGINE': 'django.db.backends.postgresql_psycopg2',
+   #     'NAME': 'project1',
+    #    'USER': 'myprojectuser',
+     #   'PASSWORD': 'password',
+      #  'HOST': 'localhost',
+       # 'PORT': '',
+    #}
+#}
+#configure django database settings
+sed -i "s/        'ENGINE': 'django.db.backends.sqlite3',/        'ENGINE': 'django.db.backends.postgresql_psycopg2',/g" /opt/django/project1/project1/settings.py
+sed -i "s/        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),/        'NAME': 'project1',/g" /opt/django/project1/project1/settings.py
+sed -i 'USER': 'myprojectuser', /opt/django/project1/project1/settings.py
+sed -i 'PASSWORD': 'nti310django', /opt/django/project1/project1/settings.py
+sed -i 'HOST': '10.128.0.9', /opt/django/project1/project1/settings.py
+sed -i 'PORT': '5432', /opt/django/project1/project1/settings.py
 
 
+
+cd ~/project1
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+
+#you can delete the existing superuser and creat yoursso this is valid for every build: 
+#echo "from django.contrib.auth.models import User; User.objects.filter(email=fjemal01@seattlecentral.edu').delete(); User.objects.create_superuser('admin@example.com', 'admin', 'nimda')" | python manage.py shell
+echo "from django.contrib.auth.models import User; User.objects.create_superuser('fjemal', 'fjemal01@seattlecentral.edu', 'nti310django')" | python manage.py shell
+
+python manage.py runserver 104.197.3.90:8000
