@@ -67,13 +67,17 @@ chown ldap: /etc/openldap/slapd.d/db.ldif
 ldapmodify -Y EXTERNAL  -H ldapi:/// -f  /etc/openldap/slapd.d/db.ldif
 
 #restrict monitor users
-cat <<EOT>> /etc/openldap/slapd.d/monitor.ldif
-dn: olcDatabase={1}monitor,cn=config
-changetype: modify
-replace: olcAccess
-olcAccess: {0}to * by dn.base="gidNumber=0+uidNumber=0,cn=peercred,cn=external, cn=auth" read by dn.base="cn=ldapadm,dc=ldap,dc=local" read by * none' > monitor.ldif
-EOT
+#cat <<EOT>> /etc/openldap/slapd.d/monitor.ldif
+#dn: olcDatabase={1}monitor,cn=config
+#changetype: modify
+#replace: olcAccess
+#olcAccess: {0}to * by dn.base="gidNumber=0+uidNumber=0,cn=peercred,cn=external, cn=auth" read by dn.base="cn=ldapadm,dc=ldap,dc=local" read by * none' > monitor.ldif
+#EOT
 #ldapmodify -Y EXTERNAL  -H ldapi:/// -f monitor.ldif
+
+echo "Copying monitor.ldif, adjusting ownership, and adding it to ldap configuration..."
+cp /tmp/NTI-310/config_scripts/monitor.ldif /etc/openldap/slapd.d/monitor.ldif
+chown ldap /etc/openldap/slapd.d/monitor.ldif
 ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
 
 systemctl start slapd.service
