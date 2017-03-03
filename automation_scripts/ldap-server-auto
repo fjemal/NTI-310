@@ -136,7 +136,7 @@ objectClass: organizationalUnit
 ou: Group" > /etc/openldap/slapd.d/base.ldif 
 
 #Build the directory structure.
-echo "adding base.ldif to ldap server
+echo "adding base.ldif to ldap server"
 cp /tmp/NTI-310/config_scripts/base.ldif /etc/openldap/slapd.d/base.ldif
 
 #ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif -y /root/ldap_admin_pass
