@@ -1,5 +1,4 @@
 #!/bin/bash
-
 echo "installing git"
 yum -y install git
 echo "clonig git"
@@ -65,7 +64,7 @@ ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
 
 systemctl start slapd.service
 systemctl enable slapd.service
-
+#
 openssl req -new -x509 -nodes -out /etc/openldap/certs/fjldapcert.pem -keyout /etc/openldap/certs/fjldapkey.pem -days 365 -subj "/C=US/ST=WA/L=Seattle/O=SCC/OU=IT/CN=ldap.local"
 chown -R ldap. /etc/openldap/certs/*.pem
 #chown -R ldap. /etc/openldap/certs/fjldapkey.pem
