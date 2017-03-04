@@ -1,0 +1,112 @@
+#!/bin/bash
+
+echo "installing git"
+yum -y install git
+echo "clonig git"
+echo "cloning fjemal's NTI-310 GitHub..."
+git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
+git config --global user.name "fjemal"
+git config --global user.email "fjemal01@seattlecentral.edu"
+
+#This is a basis for students to create a fully functioning build, compile, and deploy script.
+echo "intalling servers and clients packages"
+yum -y update
+yum -y install openldap compat-openldap openldap-clients openldap-servers openldap-servers-sql openldap-devel
+
+echo "copying config files"
+cp /usr/share/openldap-servers/DB_CONFIG.example /var/lapib/ldap/DB_CONFIG 
+chown ldap. /var/lib/ldap/DB_CONFIG
+
+# Tell SE linux what's going on, so that it doesn't freek
+setsebool -P httpd_can_connect_ldap on
+systemctl enable slapd
+systemctl start slapd
+
+echo "installing and enabling apache server"
+yum -y install httpd
+systemctl enable httpd
+systemctl start httpd
+
+echo "start slapd service" 
+systemctl start slapd.service 
+systemctl enable slapd.service 
+
+echo "generating ldap slappasswrd"
+newsecret=$(slappasswd -g)
+newhash=$(slappasswd -s "$newsecret")
+echo -n "$newsecret" > /root/ldap_admin_pass
+chmod 0600 /root/ldap_admin_pass
+
+chown ldap: /etc/openldap/slapd.d/db.ldif
+echo "add db.ldif to ldap configuration"
+
+ echo "dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcSuffix
+olcSuffix: dc=ldap,dc=local
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootDN
+olcRootDN: cn=ldapadm,dc=ldap,dc=local
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootPW
+olcRootPW: $newhash" >>  /etc/openldap/slapd.d/db.ldif
+chown ldap: /etc/openldap/slapd.d/db.ldif
+#echo "add db.ldif to ldap configuration"
+ldapmodify -Y EXTERNAL  -H ldapi:/// -f  /etc/openldap/slapd.d/db.ldif
+
+echo "Copying monitor.ldif, adjusting ownership, and adding it to ldap configuration..."
+cp /tmp/NTI-310/config_scripts/monitor.ldif /etc/openldap/slapd.d/monitor.ldif
+chown ldap /etc/openldap/slapd.d/monitor.ldif
+ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
+
+systemctl start slapd.service
+systemctl enable slapd.service
+
+openssl req -new -x509 -nodes -out /etc/openldap/certs/fjldapcert.pem -keyout /etc/openldap/certs/fjldapkey.pem -days 365 -subj "/C=US/ST=WA/L=Seattle/O=SCC/OU=IT/CN=ldap.local"
+chown -R ldap. /etc/openldap/certs/*.pem
+#chown -R ldap. /etc/openldap/certs/fjldapkey.pem
+echo "dn: cn=config
+changetype: modify
+replace: olcTLSCertificateFile
+olcTLSCertificateFile: /etc/openldap/certs/fjldapcert.pem
+
+dn: cn=config
+changetype: modify
+replace: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /etc/openldap/certs/fjldapkey.pem" > certs.ldif
+
+ldapmodify -Y EXTERNAL  -H ldapi:/// -f certs.ldif
+chown ldap: certs.ldif
+
+slaptest -u
+unalias cp
+
+#Set up LDAP database
+cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
+chown ldap:ldap /var/lib/ldap/*
+echo "Adding schemas"
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
+ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
+
+echo "adding new entry cn=inetorgperson,cn=schema,cn=config"
+echo "generating base.ldif file for your domain"
+
+#Build the directory structure.
+echo "adding base.ldif to ldap server"
+cp /tmp/NTI-310/config_scripts/base.ldif /etc/openldap/slapd.d/base.ldif
+
+#ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif -y /root/ldap_admin_pass
+ldapadd -x -D "cn=ldapadm,dc=ldap,dc=local" -f /etc/openldap/slapd.d/base.ldif -y /root/ldap_admin_pass
+#allow firewall
+firewall-cmd --permanent --zone=public --add-service=http
+firewall-cmd --reload
+
+
+
+
+
