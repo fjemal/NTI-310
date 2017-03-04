@@ -108,4 +108,4 @@ python manage.py createsuperuser
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('fjemal', 'fjemal01@seattlecentral.edu', 'nti310django')" | python manage.py shell
 
 python manage.py runserver 0.0.0.0:8000
-#for disllowed host error edit project1/settings.py and add the django ip to ALLOWED_HOST
+#for disallowed host error edit project1/settings.py and add the django ip to ALLOWED_HOST
