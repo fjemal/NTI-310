@@ -88,7 +88,7 @@ sed -i '$ a\session required    pam_mkhomedir.so skel=/etc/skel umask=0077' /etc
 #root    ALL=(ALL:ALL) ALL
 
 # Members of the admin group may gain root privileges
-sed -i 's,%admin=(ALL) ALL,#%admin ALL=(ALL) ALL,g' /etc/sudoers                                        #  <<<<<<<<<comment out
+sed -i 's/%admin=(ALL) ALL/#%admin ALL=(ALL) ALL/g' /etc/sudoers                                        #  <<<<<<<<<comment out
 
 # Allow members of group sudo to execute any command
 #%sudo   ALL=(ALL:ALL) ALL
@@ -102,9 +102,9 @@ cd /etc/ssh
 #vi sshd_config
 
 #comment out 
-sed -i 's,PasswordAuthentication no,#PasswordAuthentication no,g' /etc/ssh/sshd_config
+sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/g' /etc/ssh/sshd_config
 #comment out 
-sed -i 's,ChallengeResponseAuthentication no,#ChallengeResponseAuthentication no,g' /etc/ssh/sshd_config
+sed -i 's/ChallengeResponseAuthentication no/#ChallengeResponseAuthentication no/g' /etc/ssh/sshd_config
 
 #restart the sshd service
 systemctl restart sshd.service 
