@@ -98,7 +98,7 @@ sed -i 'PORT': '5432', /opt/django/project1/project1/settings.py
 
 
 
-cd /project1
+cd /opt/django/project1
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
