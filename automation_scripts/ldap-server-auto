@@ -140,7 +140,7 @@ echo "installing phpldadadmin"
 yum -y install epel-release
 yum install -y phpldapadmin
 sed -i 's,Require local,#Require local\n    Require all granted,g' /etc/httpd/conf.d/phpldapadmin.conf
-cp /tmp/NTI-310/config_scripts/config.php /etc/phpldapadmin/config.php
+cp /tmp/NTI-310/config_scripts/config.php /etc/phpldapadmin/config.php  
 chown ldap:apache /etc/phpldapadmin/config.php
 systemctl restart httpd.service
 
