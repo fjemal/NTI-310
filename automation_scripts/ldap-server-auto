@@ -42,7 +42,6 @@ newhash=$(slappasswd -s "$newsecret")
 echo -n "$newsecret" > /root/ldap_admin_pass
 chmod 0600 /root/ldap_admin_pass
 
-chown ldap: /etc/openldap/slapd.d/db.ldif
 echo "add db.ldif to ldap configuration"
 
  echo "dn: olcDatabase={2}hdb,cn=config
@@ -60,6 +59,7 @@ changetype: modify
 replace: olcRootPW
 olcRootPW: $newhash" >>  /etc/openldap/slapd.d/db.ldif
 chown ldap: /etc/openldap/slapd.d/db.ldif
+
 #echo "add db.ldif to ldap configuration"
 ldapmodify -Y EXTERNAL  -H ldapi:/// -f  /etc/openldap/slapd.d/db.ldif
 
@@ -95,10 +95,7 @@ ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/certs.ldif
 
 slaptest -u
 
-unalias cp
 #Set up LDAP database
-cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
-chown ldap:ldap /var/lib/ldap/*
 echo "Adding schemas"
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
