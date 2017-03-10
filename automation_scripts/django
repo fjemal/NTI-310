@@ -3,6 +3,12 @@
 git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
 git config --global user.name "fjemal"
 git config --global user.email "fjemal01@seattlecentral.edu"
+
+echo "installing apache"
+#install and start Apache
+sudo yum -y install httpd
+sudo systemctl enable httpd
+sudo systemctl start httpd
 echo "Current python version:"
 
 python --version
