@@ -2,6 +2,7 @@ dn: cn=config
 changetype: modify
 replace: olcTLSCertificateFile
 olcTLSCertificateFile: /etc/openldap/certs/fjldapcert.pem
+
 dn: cn=config
 changetype: modify
 replace: olcTLSCertificateKeyFile
