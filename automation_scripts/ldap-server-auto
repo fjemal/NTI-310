@@ -18,6 +18,7 @@ cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG
 chown ldap. /var/lib/ldap/DB_CONFIG
 
 # Tell SE linux what's going on, so that it doesn't freek
+echo "starting enabling and starting apache"
 setsebool -P httpd_can_connect_ldap on
 systemctl enable slapd
 systemctl start slapd
@@ -86,6 +87,7 @@ systemctl enable slapd.service
 #chown ldap. /etc/openldap/slapd.d/monitor.ldif
 #ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/monitor.ldif
 #Create LDAP certificate
+echo "creating certs"
 openssl req -new -x509 -nodes -out /etc/openldap/certs/fjldapcert.pem -keyout /etc/openldap/certs/fjldapkey.pem -days 365 -subj "/C=US/ST=WA/L=Seattle/O=SCC/OU=IT/CN=ldap.local"
 chown -R ldap /etc/openldap/certs/*.pem
 #chown -R ldap. /etc/openldap/certs/fjldapkey.pem
@@ -124,9 +126,9 @@ echo "generating base.ldif file for your domain"
 #ou: Group" > /etc/openldap/slapd.d/base.ldif 
 
 #Build the directory structure.
-#echo "adding base.ldif to ldap server"
+echo "adding base.ldif to ldap server"
 cp /tmp/NTI-310/config_scripts/base.ldif /etc/openldap/slapd.d/base.ldif
-
+echo "adding ldap to the server"
 #ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif -y /root/ldap_admin_pass
 ldapadd -x -D "cn=ldapadm,dc=ldap,dc=local" -f /etc/openldap/slapd.d/base.ldif -y /root/ldap_admin_pass
 #allow firewall
@@ -140,14 +142,14 @@ sed -i 's,Require local,#Require local\n    Require all granted,g' /etc/httpd/co
 cp /tmp/NTI-310/config_scripts/config.php /etc/phpldapadmin/config.php  
 chown ldap:apache /etc/phpldapadmin/config.php
 systemctl restart httpd.service
-
+echo "installing mod_ssl"
 yum -y install mod_ssl
 mkdir /etc/ssl/private
 chmod 700 /etc/ssl/private
 #ls -lah /etc/ssl/private/
 ls -lah /etc/ssl/private/
 ls -lah /etc/ssl/
-
+echo "creating selfsigned key"
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -subj "/C=US/ST=WA/L=Seattle/O=IT/OU=NTI310IT/CN=ldap.local" -out /etc/ssl/certs/apache-selfsigned.crt
 openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
 cat /etc/ssl/certs/dhparam.pem | tee -a /etc/ssl/certs/apache-selfsigned.crt
