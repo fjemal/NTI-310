@@ -39,6 +39,8 @@ sudo firewall-cmd --reload
 #\q
 sudo yum -y install phpPgAdmin
 sed -i 's,  Require local,  Require all granted,g' /etc/httpd/conf.d/phpPgAdmin.conf
+sudo cp /tmp/NTI-310/config_scripts/config.inc.php /etc/phpPgAdmin/config.inc.php
 
 sudo setsebool -P httpd_can_network_connect_db on
 sudo systemctl restart postgresql
+sudo systemctl restart httpd
