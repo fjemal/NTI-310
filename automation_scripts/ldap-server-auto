@@ -15,7 +15,7 @@ yum -y update
 yum -y install openldap compat-openldap openldap-clients openldap-servers openldap-servers-sql openldap-devel
 cp /usr/share/openldap-servers/DB_CONFIG.example /var/lib/ldap/DB_CONFIG 
 chown ldap. /var/lib/ldap/DB_CONFIG
-
+sleep 5
 # Tell SE linux what's going on, so that it doesn't freek
 echo "starting enabling and starting apache"
 setsebool -P httpd_can_connect_ldap on
@@ -41,7 +41,7 @@ newsecret=$(slappasswd -g)
 newhash=$(slappasswd -s "$newsecret")
 echo -n "$newsecret" > /root/ldap_admin_pass
 chmod 0600 /root/ldap_admin_pass
-
+sleep 5
 echo "add db.ldif to ldap configuration"
 
  echo "dn: olcDatabase={2}hdb,cn=config
@@ -134,7 +134,7 @@ ldapadd -x -D "cn=ldapadm,dc=ldap,dc=local" -f /etc/openldap/slapd.d/base.ldif -
 #allow firewall
 firewall-cmd --permanent --zone=public --add-service=http
 firewall-cmd --reload
-
+sleep 5
 echo "installing phpldadadmin"
 yum -y install epel-release
 yum install -y phpldapadmin
@@ -154,7 +154,7 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apa
 openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
 cat /etc/ssl/certs/dhparam.pem | tee -a /etc/ssl/certs/apache-selfsigned.crt
 #modify /etc/httpd/conf.d/ssl.conf
-
+sleep 5
 sed  -i '/<VirtualHost *:443>\a Alias \/phpldapadmin \/usr\/share\/phpldapadmin\/htdocs' /etc/httpd/conf.d/ssl.conf
 sed  -i '/Alias \/phpldapadmin \/usr\/share\/phpldapadmin\/htdocs/a Alias \/ldapadmin \/usr\/share\/phpldapadmin\/htdocs' /etc/httpd/conf.d/ssl.conf
 sed  -i '/Alias \/ldapadmin \/usr\/share\/phpldapadmin\/htdocs/a DocumentRoot \"\/usr\/share\/phpldapadmin\/htdocs\"' /etc/httpd/conf.d/ssl.conf
@@ -188,9 +188,9 @@ sed -i 's/SLAPD_URLS="ldapi:\/\/\/ ldap:\/\/\/"/SLAPD_URLS=\"ldapi:\/\/\/ ldap:\
 
 #restart httpd and slapd
 
-echo "TLS_REQCERT allow" >> /etc/openldap/ldap.conf
-echo "tls_reqcert allow" >> /etc/nslcd.conf
-authconfig --enableldaptls --update 
+#echo "TLS_REQCERT allow" >> /etc/openldap/ldap.conf
+#echo "tls_reqcert allow" >> /etc/nslcd.conf
+#authconfig --enableldaptls --update 
 
 systemctl restart httpd
 systemctl restart slapd
