@@ -17,7 +17,7 @@ systemctl start postgresql.service
 #sudo vim /var/lib/pgsql/data/postgresql.conf
 #Set the following parameter:
 sudo cp /tmp/NTI-310/config_scripts/postgres.sql /var/lib/pgsql/postgres.sql
-sudo -i -u postgres psql -U postgres -f /var/lib/pgsql/postgres.sql
+
 #listen_addresses = 'localhost'
 
 #or execute the following command
@@ -40,7 +40,16 @@ sudo firewall-cmd --reload
 sudo yum -y install phpPgAdmin
 sed -i 's,  Require local,  Require all granted,g' /etc/httpd/conf.d/phpPgAdmin.conf
 sudo cp /tmp/NTI-310/config_scripts/config.inc.php /etc/phpPgAdmin/config.inc.php
-
+echo "CREATE DATABASE postgres ;
+ALTER USER postgres WITH PASSWORD 'P@ssw0rd1';
+CREATE DATABASE project1;
+CREATE USER project1 WITH PASSWORD 'P@ssw0rd1';
+ALTER ROLE project1 SET client_encoding TO 'utf8';
+ALTER ROLE project1 SET default_transaction_isolation TO 'read committed';
+ALTER ROLE project1 SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE project1 TO project1;
+\q " > /tmp/NTI-310/config_scripts/postgres.sql
+sudo -i -u postgres psql -U postgres -f /var/lib/pgsql/postgres.sql
 sudo setsebool -P httpd_can_network_connect_db on
 sudo systemctl restart postgresql
 sudo systemctl restart httpd
