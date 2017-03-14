@@ -112,7 +112,7 @@ dc: ldap
 objectClass: top
 objectClass: domain
 
-dn: cn=ldapadm,dc=ldap,dc=local
+dn: cn=ldapadm ,dc=ldap,dc=local
 objectClass: organizationalRole
 cn: ldapadm
 description: LDAP Manager
