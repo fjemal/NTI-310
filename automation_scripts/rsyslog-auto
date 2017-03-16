@@ -1,5 +1,5 @@
 # decent doc: http://www.itzgeek.com/how-tos/linux/centos-how-tos/setup-syslog-server-on-centos-7-rhel-7.html
-#rsyslog already installed.
+yum -y install rsyslog
 
 # edit /etc/rsyslog.conf
  #   (uncomment TCP and UDP available ports
