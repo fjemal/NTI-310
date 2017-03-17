@@ -1,0 +1,162 @@
+#!/bin/bash
+	
+
+	echo "This is Fadil's Gcloud Automation"
+	
+
+	echo "Authorizing fjemal01 for this project..."
+	gcloud auth login fjemal01@seattlecentral.edu--no-launch-browser
+	
+
+	echo "Enabling billing..."
+	gcloud alpha billing accounts projects link final-161721--account-id=006C0D-619A5B-A95AED
+	
+
+	echo "Setting admin account-id..."
+	gcloud config set account fjemal01@seattlecentral.edu
+	
+
+	echo "Setting the project for Configuration..."
+	gcloud config set project final-161721
+	
+
+	echo "Setting zone/region for Configuration..."
+	gcloud config set compute/zone us-west1-b
+	
+
+	gcloud config set compute/region us-west1
+	
+
+	echo "Creating firewall-rules..."
+	gcloud compute firewall-rules create allow-http --description "Incoming http allowed." \
+	    --allow tcp:80
+	
+
+	gcloud compute firewall-rules create allow-ldap --description "Incoming ldap allowed." \
+	    --allow tcp:636
+	
+
+	gcloud compute firewall-rules create allow-postgresql --description "Posgresql allowed." \
+	    --allow tcp:5432
+	
+
+	gcloud compute firewall-rules create allow-https --description "Incoming https allowed." \
+	    --allow tcp:443
+	
+
+	gcloud compute firewall-rules create allow-django --description "Django test server connection allowed." \
+	    --allow tcp:8000
+	
+
+	gcloud compute firewall-rules create allow-ftp --description "FTP Allowed." \
+	    --allow tcp:21
+	
+
+	echo "Creating the ldap instance and running the install script..."
+	gcloud compute instances create ldap-server-test \
+	    --image-family centos-7 \
+	    --image-project centos-cloud \
+	    --machine-type f1-micro \
+	    --scopes cloud-platform \
+	   --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/ldap-server-auto \
+    
+     echo "Creating the rsyslog server instance and running the install script..."
+
+         gcloud compute instances create rsyslog \
+         --image-family centos-7 \
+         --image-project centos-cloud \
+         --machine-type f1-micro \
+         --scopes cloud-platform \
+        --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/rsyslog-server-auto \
+
+
+echo "Creating ubuntu-client-a instance and running the install scripts..."
+gcloud compute instances create ubuntu-client-a \
+    --image-family ubuntu-1604-lts \
+    --image-project ubuntu-os-cloud \
+    --machine-type f1-micro \
+    --scopes cloud-platform \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/myldap-client \
+
+echo "Creating ubuntu-client-b instance and running the install scripts..."
+gcloud compute instances create  ubuntu-client1 \
+    --image-family ubuntu-1604-lts \
+    --image-project ubuntu-os-cloud \
+    --machine-type f1-micro \
+    --scopes cloud-platform \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/myldap-client \
+
+echo "Creating ubuntu-client-c instance and running the install scripts..."
+gcloud compute instances create ubuntu-client2 \
+    --image-family ubuntu-1604-lts \
+    --image-project ubuntu-os-cloud \
+    --machine-type f1-micro \
+    --scopes cloud-platform \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/myldap-client \
+
+
+echo "Creating the nfs-server and running the install script..."
+gcloud compute instances create postgres-a \
+    --image-family centos-7 \
+    --image-project centos-cloud \
+    --machine-type f1-micro \
+    --scopes cloud-platform \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgresql-auto \
+
+echo "Creating the postgres-a-test server and running the install script..."
+gcloud compute instances create postgres-b \
+    --image-family centos-7 \
+    --image-project centos-cloud \
+    --machine-type f1-micro \
+    --scopes cloud-platform \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgresql-auto \
+
+echo "Creating the postgres-b-staging server and running the install script..."
+gcloud compute instances create postgres-c \
+    --image-family centos-7 \
+    --image-project centos-cloud \
+    --machine-type f1-micro \
+    --scopes cloud-platform \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgresql-auto \
+
+echo "Creating the postgres-c-production server and running the install script..."
+gcloud compute instances create django-a \
+    --image-family centos-7 \
+    --image-project centos-cloud \
+    --machine-type f1-micro \
+    --scopes cloud-platform \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django \
+
+echo "Creating the django-a-test server and running the install script..."
+gcloud compute instances create django-b \
+    --image-family centos-7 \
+    --image-project centos-cloud \
+    --machine-type f1-micro \
+    --scopes cloud-platform \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django \
+
+echo "Creating the django-b-staging server and running the install script..."
+gcloud compute instances create django-c \
+    --image-family centos-7 \
+    --image-project centos-cloud \
+    --machine-type f1-micro \
+    --scopes cloud-platform \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django \
+
+echo "Creating the django-c-production server and running the install script..."
+gcloud compute instances create django-c-production \
+    --image-family centos-7 \
+    --image-project centos-cloud \
+    --machine-type f1-micro \
+    --scopes cloud-platform \
+    --metadata-from-file startup-script=/Users/Jonathan/desktop/NTI310/NTI-310/automation_scripts/django-production-install.sh \
+
+echo "Jwade005's Google Cloud Final Project Automatic Installation Complete. :)
+
+
+
+
+
+
+
+
