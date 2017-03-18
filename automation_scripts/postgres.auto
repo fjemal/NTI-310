@@ -29,8 +29,8 @@ sudo systemctl enable postgresql
 #Edit /var/lib/pgsql/data/postgresql.conf and configure PostgreSQL to listen on localhost:
 #sudo vim /var/lib/pgsql/data/postgresql.conf
 #Set the following parameter:
-sudo cp /tmp/NTI-310/config_scripts/postgres.conf /var/lib/pgsql/postgres.conf
-sudo -i -u postgres psql -U postgres -f /var/lib/pgsql/postgres.conf
+sudo cp /tmp/NTI-310/config_scripts/postgres.conf /var/lib/pgsql/postgres.sql
+sudo -i -u postgres psql -U postgres -f /var/lib/pgsql/postgres.sql
 #listen_addresses = 'localhost'
 
 #or execute the following command
