@@ -44,9 +44,6 @@ sudo sed -i -e "\$ahost    all             all             0.0.0.0/0      md5" /
 
 sudo -i -u postgres pg_ctl reload
 
-
-
-
 #sudo -i -u postgres
 # log into postgres account
 #You can get a Postgres prompt immediately by typing:
