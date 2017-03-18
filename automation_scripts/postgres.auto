@@ -2,21 +2,37 @@
 echo "installing git"
 yum -y install git
 #echo "cloning fjemal01's NTI-310 GitHub..."
+echo "installing postgres..."
+sudo yum -y install epel-release-7
+sudo yum -y install postgresql-server postgresql-contrib
+
+echo "cloning fjemal's NTI-Github..."
 git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
 git config --global user.name "fjemal"
 git config --global user.email "fjemal01@seattlecentral.edu"
-echo "Current python version:"
-echo "updating the server"
-sudo yum -y update
-echo "installing postgres"
-sudo yum install postgresql-server postgresql-contrib
-sudo yum install epel-release
+
+#echo "Current python version:"
+#echo "updating the server"
+#sudo yum -y update
+#echo "installing postgres"
+#sudo yum install postgresql-server postgresql-contrib
+sudo yum -y install httpd
+
+sudo systemctl enable httpd
+sudo systemctl start httpd
+
+sudo firewall-cmd --permanent --zone=public --add-service=postgresql
+sudo firewall-cmd --reload
+
 sudo postgresql-setup initdb
-systemctl start postgresql.service
+
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
 #Edit /var/lib/pgsql/data/postgresql.conf and configure PostgreSQL to listen on localhost:
 #sudo vim /var/lib/pgsql/data/postgresql.conf
 #Set the following parameter:
-sudo cp /tmp/NTI-310/config_scripts/postgressql.conf /var/lib/pgsql/postgressq.conf
+sudo cp /tmp/NTI-310/config_scripts/postgres.conf /var/lib/pgsql/postgres.conf
 sudo -i -u postgres psql -U postgres -f /var/lib/pgsql/postgressql.conf
 #listen_addresses = 'localhost'
 
