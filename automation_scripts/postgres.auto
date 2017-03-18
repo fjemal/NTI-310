@@ -2,6 +2,7 @@
 echo "installing git"
 yum -y install git
 #echo "cloning fjemal01's NTI-310 GitHub..."
+
 echo "installing postgres..."
 sudo yum -y install epel-release-7
 sudo yum -y install postgresql-server postgresql-contrib
@@ -17,12 +18,13 @@ git config --global user.email "fjemal01@seattlecentral.edu"
 #echo "installing postgres"
 #sudo yum install postgresql-server postgresql-contrib
 sudo yum -y install httpd
-
 sudo systemctl enable httpd
 sudo systemctl start httpd
 
 sudo postgresql-setup initdb
 
+sudo firewall-cmd --permanent --zone=public --add-service=postgresql
+sudo firewall-cmd --reload
 #Edit /var/lib/pgsql/data/postgresql.conf and configure PostgreSQL to listen on localhost:
 #sudo vim /var/lib/pgsql/data/postgresql.conf
 #Set the following parameter:
@@ -44,8 +46,7 @@ sudo -i -u postgres pg_ctl reload
 
 sudo setsebool -P httpd_can_network_connect_db on
 
-sudo firewall-cmd --permanent --zone=public --add-service=postgresql
-sudo firewall-cmd --reload
+
 
 #sudo -i -u postgres
 # log into postgres account
