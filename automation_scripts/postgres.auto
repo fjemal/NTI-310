@@ -44,7 +44,6 @@ sudo sed -i -e "\$ahost    all             all             0.0.0.0/0      md5" /
 
 sudo -i -u postgres pg_ctl reload
 
-sudo setsebool -P httpd_can_network_connect_db on
 
 
 
@@ -55,9 +54,13 @@ sudo setsebool -P httpd_can_network_connect_db on
 #Exit out of the PostgreSQL prompt
 #\q
 sudo yum -y install phpPgAdmin
+
 sed -i 's,  Require local,  Require all granted,g' /etc/httpd/conf.d/phpPgAdmin.conf
 
 sudo cp /tmp/NTI-310/config_scripts/config.inc.php /etc/phpPgAdmin/config.inc.php
+
+sudo setsebool -P httpd_can_network_connect_db on
+
 sudo systemctl start postgresql
 
 sudo systemctl restart httpd
