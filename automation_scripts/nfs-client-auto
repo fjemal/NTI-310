@@ -1,34 +1,11 @@
-#install nfs server
-#yum install nfs-utils
-#yum install net-tools
-#mkdir /var/nfsshare
-#chmod -R 777 /var/nfsshare/
-#mkdir /var/config/
-#chmod -R 777 /var/config
-#start and enable services
-systemctl enable rpcbind
-#systemctl enable nfs-server
-#systemctl enable nfs-lock
-#systemctl enable nfs-idmap
-#systemctl start rpcbind
-#systemctl start nfs-server
-#systemctl start nfs-lock
-#systemctl start nfs-idmap
-#edit /etc/exports
-#echo "/home      *(rw,sync,no_root_squash)
-#/var/nfsshare    *(rw,sync,no_root_squash)
-#/var/config      *(rw,sync,no_root_squash)" >> /ect/exports
-
-
-#start the NFS service 
-#systemctl restart nfs-server
-#add the NFS service override in CentOS 7.0 firewall-cmd public zone service
-#firewall-cmd --permanent --zone=public --add-service=nfs
-#firewall-cmd --reload
+#!/bin/bash
 
 #install and config nfs client
-apt-get -y install nfs-client
-apt-get -y install nfs-common
+apt-get -y install nfs-client nfs-common nfs-kernel-server
+#apt-get -y install nfs-common
+service nfs-kernel-server start
+
+echo "making dir for nfs"
 mkdir -p /mnt/nfs/home
 mkdir -p /mnt/nfs/var/nfsshare
 mkdir -p /mnt/nfs/var/config
@@ -50,5 +27,8 @@ echo "10.128.0.4:/home            /mnt/nfs/home           nfs     defaults 0 0" 
 echo "10.128.0.4:/var/dev         /mnt/nfs/var/dev        nfs     defaults 0 0" >> /etc/fstab
 echo "10.128.0.4:/var/config      /mnt/nfs/var/config     nfs     defaults 0 0" >> /etc/fstab
 
-mount -a
 
+apt-get -y install tree
+mount -a
+df -h
+ tree /mount
