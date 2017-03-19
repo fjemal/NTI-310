@@ -4,11 +4,14 @@ git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
 git config --global user.name "fjemal"
 git config --global user.email "fjemal01@seattlecentral.edu"
 
-echo "installing apache"
 #install and start Apache
-sudo yum -y install httpd
-sudo systemctl enable httpd
-sudo systemctl start httpd
+echo "installing and enabling apache"
+
+sudo yum -y install httpd.service
+sudo systemctl enable httpd.service
+
+echo "starting apche server"
+sudo systemctl start httpd.service
 echo "Current python version:"
 
 python --version
@@ -23,7 +26,7 @@ echo "installing virtualenv so we can give django its own version of python"
 # this adds the noarch release reposatory from the fedora project, wich contains python pip
 # python pip is a package manager for python...
 
-sudo rpm -iUvh https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm
+sudo rpm -iUvh https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm
 
 sudo yum -y install python-pip
 
@@ -48,8 +51,6 @@ source /opt/django/django-env/bin/activate
 
 echo "to switch out of virtualenv, type deactivate"
 
-echo "now using:"
-
 which python
 
 sudo chown -R fadilj /opt/django
@@ -65,22 +66,36 @@ django-admin --version
 
 django-admin startproject project1
 
-echo "here's our new django project dir"
+echo "Adjusting settings.py allowed_hosts..."
+sed -i "s,ALLOWED_HOSTS = \[\],ALLOWED_HOSTS = \['*'\],g" /opt/django/project1/project1/settings.py
+
 sudo yum -y install tree
 tree project1
 
-echo "go to https://docs.djangoproject.com/en/1.10/intro/tutorial01/"
+echo "starting django server"
 
-sudo pip install virtualenv
+sudo chmod 644 /opt/django/project1/manage.py
+sudo setenforce 0
+
+echo "activating django"
+source /opt/django/django-env/bin/activate
+
+cd /opt/django/project1
+
+echo "Django is now accessible from the web at [server IP]:8000..."
+
+sudo yum -y install python-devel postgresql-devel
+sudo yum -y install gcc
+
 
 #mkdir ~/project1
 #cd ~/project1
 #virtualenv myprojectenv
 #source myprojectenv/bin/activate
 
-sed -i "s,ALLOWED_HOSTS = \[\],ALLOWED_HOSTS = \['*'\],g" /opt/django/project1/project1/settings.py
-
 pip install django psycopg2
+
+
 django-admin.py startproject project1 .
 #edit the following files~/project1/project1/settings.py
 
@@ -100,7 +115,7 @@ sed -i "s/        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),/        'NAME': 
 
 
 sed  i  "79a\       'USER': 'projectuser'," /opt/django/project1/project1/settings.py
-sed -i  "80a\       'PASSWORD': 'nti310django'," /opt/django/project1/project1/settings.py
+sed -i  "80a\       'PASSWORD': 'P@ssw0rd1'," /opt/django/project1/project1/settings.py
 sed -i  "81a\       'HOST': '10.128.0.9'," /opt/django/project1/project1/settings.py
 sed -i  "82a\       'PORT': '5432'," /opt/django/project1/project1/settings.py
 
@@ -109,11 +124,12 @@ sed -i  "82a\       'PORT': '5432'," /opt/django/project1/project1/settings.py
 cd /opt/django/project1
 python manage.py makemigrations
 python manage.py migrate
+
 python manage.py createsuperuser
 
 #you can delete the existing superuser and creat yoursso this is valid for every build: 
 #echo "from django.contrib.auth.models import User; User.objects.filter(email=fjemal01@seattlecentral.edu').delete(); User.objects.create_superuser('admin@example.com', 'admin', 'nimda')" | python manage.py shell
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('fjemal', 'fjemal01@seattlecentral.edu', 'nti310django')" | python manage.py shell
 
-python manage.py runserver 0.0.0.0:8000
+python manage.py runserver 0.0.0.0:8000&
 #for disallowed host error edit project1/settings.py and add the django ip to ALLOWED_HOST
