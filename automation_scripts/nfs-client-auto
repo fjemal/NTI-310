@@ -7,7 +7,7 @@ service nfs-kernel-server start
 
 echo "making dir for nfs"
 mkdir -p /mnt/nfs/home
-mkdir -p /mnt/nfs/var/nfsshare
+mkdir -p /mnt/nfs/var/dev
 mkdir -p /mnt/nfs/var/config
 #Start the services and add them to boot menu
 systemctl enable rpcbind
@@ -18,9 +18,9 @@ systemctl start rpcbind
 systemctl start nfs-server
 systemctl start nfs-lock
 systemctl start nfs-idmap
-mount -t nfs  "nfs-server-ip":/home /mnt/nfs/home/
-mount -t nfs  "nfs-server-ip":/var/nfsshare /mnt/nfs/var/nfsshare/
-mount -t nfs  "nfs-server-ip":/var/nfsshare /mnt/nfs/var/config/
+mount -t nfs  "10.128.0.4":/home /mnt/nfs/home
+mount -t nfs  "10.128.0.4":/var/dev /mnt/nfs/var/dev
+mount -t nfs  "10.128.0.4":/var/nfsshare /mnt/nfs/var/config
 #check if connected  with nfs share
 
 echo "10.128.0.4:/home            /mnt/nfs/home           nfs     defaults 0 0" >> /etc/fstab
