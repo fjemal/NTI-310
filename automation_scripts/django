@@ -111,11 +111,11 @@ django-admin.py startproject project1 .
 #}
 #configure django database settings
 sed -i "s/        'ENGINE': 'django.db.backends.sqlite3',/        'ENGINE': 'django.db.backends.postgresql_psycopg2',/g" /opt/django/project1/project1/settings.py
-sed -i "s/        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),/        'NAME': 'project1',/g" /opt/django/project1/project1/settings.py
-sed  i  "79a\       'USER': 'projectuser',g" /opt/django/project1/project1/settings.py
-sed -i  "80a\       'PASSWORD': 'P@ssw0rd1',g" /opt/django/project1/project1/settings.py
-sed -i  "81a\       'HOST': '10.128.0.9',g" /opt/django/project1/project1/settings.py
-sed -i  "82a\       'PORT': '5432',g" /opt/django/project1/project1/settings.py
+sed -i "s/       'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),/        'NAME': 'project1',/g" /opt/django/project1/project1/settings.py
+sed  i "78a\       'USER': 'projectuser'," /opt/django/project1/project1/settings.py
+sed -i "79a\       'PASSWORD': 'P@ssw0rd1'," /opt/django/project1/project1/settings.py
+sed -i "80a\       'HOST': '10.128.0.9'," /opt/django/project1/project1/settings.py
+sed -i "81a\       'PORT': '5432'," /opt/django/project1/project1/settings.py
 
 
 
