@@ -1,5 +1,7 @@
 #!/bin/bash
 #echo "cloning fjemal01's NTI-310 GitHub..."
+
+yum -y install git
 git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
 git config --global user.name "fjemal"
 git config --global user.email "fjemal01@seattlecentral.edu"
