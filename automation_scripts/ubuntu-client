@@ -161,7 +161,7 @@ service rsyslog restart                                     #ubuntu comman
  #vi /etc/rsyslog.conf
    # (uncomment TCP and UDP available ports)
       systemctl restart rsyslog.service
-     yum install net-tools
+     sudo apt-get install net-tools
     #  netstat -antup | grep 514
 
 
