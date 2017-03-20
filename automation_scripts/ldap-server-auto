@@ -32,7 +32,7 @@ yum -y install httpd
 systemctl enable httpd
 systemctl start httpd
 
-setsebool -P httpd_can_connect_ldap on
+#setsebool -P httpd_can_connect_ldap on
 sed -i 's,Require local,#Require local\n    Require all granted,g' /etc/httpd/conf.d/phpldapadmin.conf
 # decent config guide: http://www.itzgeek.com/how-tos/linux/centos-how-tos/install-configure-phpldapadmin-centos-7-ubuntu-16-04.html
 #Note: LDAP comes up completely insecure, with Anonymous login enabled by default... this is not a good and happy thing, so fix 
