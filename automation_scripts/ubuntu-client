@@ -15,7 +15,7 @@ git config --global user.email "fjemal01@seattlecentral.edu"
 cp /tmp/NTI-310/config_scripts/ldap.conf /etc/ldap.conf
 
 #configure ldap client
-
+ip=$(gcloud compute instances list | grep ldap-server | awk '{print $4}')
 #use sed to add config lines to /etc/ldap.conf
 sed -i 's,base dc=example\,dc=net,base dc=ldap\,dc=local,g' /etc/ldap.conf
 sed -i 's,uri ldapi:///,uri ldap://10.128.0.5/,g' /etc/ldap.conf
@@ -120,6 +120,8 @@ echo "making dir for nfs"
 mkdir -p /mnt/nfs/home
 mkdir -p /mnt/nfs/var/dev
 mkdir -p /mnt/nfs/var/config
+
+service nfs-idmapd start
 #Start the services and add them to boot menu
 systemctl enable rpcbind
 systemctl enable nfs-server
@@ -129,22 +131,21 @@ systemctl start rpcbind
 systemctl start nfs-server
 systemctl start nfs-lock
 systemctl start nfs-idmap
-mount -t nfs  "10.128.0.4":/home /mnt/nfs/home
-mount -t nfs  "10.128.0.4":/var/dev /mnt/nfs/var/dev
-mount -t nfs  "10.128.0.4":/var/nfsshare /mnt/nfs/var/config
+
+sudo mount -v -t nfs  "10.128.0.4":/home /mnt/nfs/home
+sudo mount -v -t nfs  "10.128.0.4":/var/dev /mnt/nfs/var/dev
+sudo mount -v -t nfs  "10.128.0.4":/var/nfsshare /mnt/nfs/var/config
 #check if connected  with nfs share
 
-echo "10.128.0.4:/home            /mnt/nfs/home           nfs     defaults 0 0" >> /etc/fstab
-echo "10.128.0.4:/var/dev         /mnt/nfs/var/dev        nfs     defaults 0 0" >> /etc/fstab
-echo "10.128.0.4:/var/config      /mnt/nfs/var/config     nfs     defaults 0 0" >> /etc/fstab
+sudo echo "10.128.0.4:/home            /mnt/nfs/home           nfs     defaults 0 0" >> /etc/fstab
+sudo echo "10.128.0.4:/var/dev         /mnt/nfs/var/dev        nfs     defaults 0 0" >> /etc/fstab
+sudo echo "10.128.0.4:/var/config      /mnt/nfs/var/config     nfs     defaults 0 0" >> /etc/fstab
 
 
 apt-get -y install tree
 mount -a
 df -h
  tree /mount
- 
- #!/bin/bash
 
 #rsyslog client-side configuration -- run as root
 #must be run on each rsyslog client
