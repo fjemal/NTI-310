@@ -1,29 +1,28 @@
-# decent doc: http://www.itzgeek.com/how-tos/linux/centos-how-tos/setup-syslog-server-on-centos-7-rhel-7.html
-yum -y install rsyslog
+#!/bin/bash
 
-# edit /etc/rsyslog.conf
- #   (uncomment TCP and UDP available ports
- systemctl restart rsyslog.service
- yum install net-tools
- netstat -antup | grep 514
+#rsyslog server side install script -- run as root on centos7 server
 
+#adjust rsyslog.conf to listen for tcp, udp communication
 
-# still need to secure log server
+sed -ie 's/#$ModLoad imudp/$ModLoad imudp/g' /etc/rsyslog.conf
 
+sed -ie 's/#$UDPServerRun 514/$UDPServerRun 514/g' /etc/rsyslog.conf
 
-#client push: 
+sed -ie 's/#$ModLoad imtcp/$ModLoad imtcp/g' /etc/rsyslog.conf
 
-#echo "*.info;mail.none;authpriv.none;cron.none   @10.128.0.7" >> /etc/rsyslog.conf && systemctl restart rsyslog.service
-#Important: this should be the internal not external IP of the server.
+sed -ie 's/#$InputTCPServerRun 514/$InputTCPServerRun 514/g' /etc/rsyslog.conf
 
-#rsyslog client-side configuration -- run as root
-#must be run on each rsyslog client
+#restart the rsyslog service
 
-ip=$(gcloud compute instances list | grep rsyslog-server | awk '{print $4}')
+systemctl restart rsyslog.service
 
-echo "*.info;mail.none;authpriv.none;cron.none    @$ip" >> /etc/rsyslog.conf
-service rsyslog restart                                     #ubuntu command
-#systemctl restart rsyslog.service                           #centos7 command
-#firewall-cmd --permanent --zone=public --add-port=514/tcp   #centos7 commnds -- inactive ufw on ubuntu
-#firewall-cmd --permanent --zone=public --add-port=514/udp
-#firewall-cmd --reload
+#open firewall port 514 to allow tcp, udp communication
+
+firewall-cmd --permanent --zone=public --add-port=514/tcp
+firewall-cmd --permanent --zone=public --add-port=514/udp
+firewall-cmd --reload
+
+#confirm server listening on port 514
+
+yum -y install net-tools
+netstat -antup | grep 514
