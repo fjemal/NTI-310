@@ -1,0 +1,173 @@
+#This is ldap-client automation script
+#Install the necessary LDAP client packages.
+#update the client server
+sudo apt-get update
+sudo apt-get -y install libnss-ldap libpam-ldap ldap-utils nscd nslcd
+#set the ubuntu environment variables DEBIAN_FRONTEND TO noninteractive
+export DEBIAN_FRONTEND=noninteractive
+unset DEBIAN_FRONTEND
+
+#echo "cloning fjemal01's NTI-310 GitHub..."
+git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
+git config --global user.name "fjemal"
+git config --global user.email "fjemal01@seattlecentral.edu"
+
+cp /tmp/NTI-310/config_scripts/ldap.conf /etc/ldap.conf
+
+#configure ldap client
+
+#use sed to add config lines to /etc/ldap.conf
+sed -i 's,base dc=example\,dc=net,base dc=ldap\,dc=local,g' /etc/ldap.conf
+sed -i 's,uri ldapi:///,uri ldap://10.128.0.5/,g' /etc/ldap.conf
+sed -i -e "s/pam_password md5/pam_password ssha/" /etc/ldap.conf
+sed -i 's,rootbinddn cn=ldapadm\,dc=example\,dc=net,#rootbinddn cn=manager\,dc=example\,dc=net,g' /etc/ldap.conf
+sed -i 's,ldap_version 3,g' /etc/ldap.conf
+sed -i 's,pam_password md5,g' /etc/ldap.conf
+#ldap://Server-IP-address #change lpdapi:/// to ldap:// 
+#use ldap version 3
+# dc=ldap,dc=local
+#cn=ldapadm,dc=ldap,dc=local
+
+
+#Configure authentication:
+# /etc/nsswitch.conf
+#
+# Example configuration of GNU Name Service Switch functionality.
+# If you have the `glibc-doc-reference' and `info' packages installed, try:
+# `info libc "Name Service Switch"' for information about this file.
+
+# vi /etc/nsswitch.conf  >>>>>>>>>>user stream edetor "sed"
+
+sed -i 's,passwd:         compat,passwd:         ldap compat,g' /etc/nsswitch.conf
+sed -i 's,group:          compat,group:          ldap compat,g' /etc/nsswitch.conf
+sed -i 's,shadow:         compat,shadow:         ldap compat,g' /etc/nsswitch.conf
+#passwd:         ldap compat
+#group:          ldap compat
+#shadow:         ldap compat
+
+
+
+#hosts:          files resolve [!UNAVAIL=return] dns
+#networks:       files
+
+#protocols:      db files
+#services:       db files
+
+#ethers:         db files
+#rpc:            db files
+
+#netgroup:       nis
+
+#edit pam.d 
+#vi /etc/pam.d/common-session
+
+#add following line at the bottom: 
+sed -i '$ a\session required    pam_mkhomedir.so skel=/etc/skel umask=0077' /etc/pam.d/common-session
+#restart the service
+/etc/init.d/nscd restart
+#[ ok ] Restarting nscd (via systemctl): nscd.service.
+#edit the sudoers
+# This file MUST be edited with the 'visudo' command as root.
+#
+# Please consider adding local content in /etc/sudoers.d/ instead$
+# directly modifying this file.
+#
+# See the man page for details on how to write a sudoers file.
+#
+#Defaults        env_reset
+#Defaults        mail_badpass
+#Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/$
+
+# Host alias specification
+
+# User alias specification
+
+# Cmnd alias specification
+
+# User privilege specification
+#root    ALL=(ALL:ALL) ALL
+
+# Members of the admin group may gain root privileges
+sed -i 's/%admin=(ALL) ALL/#%admin ALL=(ALL) ALL/g' /etc/sudoers                                        #  <<<<<<<<<comment out
+
+# Allow members of group sudo to execute any command
+#%sudo   ALL=(ALL:ALL) ALL
+
+# See sudoers(5) for more information on "#include" directives:
+
+#includedir /etc/sudoers.d
+#edit sshd config
+cd /etc/ssh
+#if permission denied cp sshd_config sshd_config.bak
+#vi sshd_config
+
+#comment out 
+sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/g' /etc/ssh/sshd_config
+#comment out 
+sed -i 's/ChallengeResponseAuthentication no/#ChallengeResponseAuthentication no/g' /etc/ssh/sshd_config
+
+#restart the sshd service
+systemctl restart sshd.service 
+
+#!/bin/bash
+
+#install and config nfs client
+apt-get -y install nfs-client nfs-common nfs-kernel-server
+#apt-get -y install nfs-common
+service nfs-kernel-server start
+
+echo "making dir for nfs"
+mkdir -p /mnt/nfs/home
+mkdir -p /mnt/nfs/var/dev
+mkdir -p /mnt/nfs/var/config
+#Start the services and add them to boot menu
+systemctl enable rpcbind
+systemctl enable nfs-server
+systemctl enable nfs-lock
+systemctl enable nfs-idmap
+systemctl start rpcbind
+systemctl start nfs-server
+systemctl start nfs-lock
+systemctl start nfs-idmap
+mount -t nfs  "10.128.0.4":/home /mnt/nfs/home
+mount -t nfs  "10.128.0.4":/var/dev /mnt/nfs/var/dev
+mount -t nfs  "10.128.0.4":/var/nfsshare /mnt/nfs/var/config
+#check if connected  with nfs share
+
+echo "10.128.0.4:/home            /mnt/nfs/home           nfs     defaults 0 0" >> /etc/fstab
+echo "10.128.0.4:/var/dev         /mnt/nfs/var/dev        nfs     defaults 0 0" >> /etc/fstab
+echo "10.128.0.4:/var/config      /mnt/nfs/var/config     nfs     defaults 0 0" >> /etc/fstab
+
+
+apt-get -y install tree
+mount -a
+df -h
+ tree /mount
+ 
+ #!/bin/bash
+
+#rsyslog client-side configuration -- run as root
+#must be run on each rsyslog client
+
+ip=$(gcloud compute instances list | grep rsyslog-server | awk '{print $4}')
+
+echo "*.info;mail.none;authpriv.none;cron.none    @$ip" >> /etc/rsyslog.conf
+service rsyslog restart                                     #ubuntu comman
+
+# decent doc: http://www.itzgeek.com/how-tos/linux/centos-how-tos/setup-syslog-server-on-centos-7-rhel-7.html
+#rsyslog already installed.
+
+ #vi /etc/rsyslog.conf
+   # (uncomment TCP and UDP available ports)
+      systemctl restart rsyslog.service
+     yum install net-tools
+    #  netstat -antup | grep 514
+
+
+# still need to secure log server
+
+
+#client push: 
+
+#echo "*.info;mail.none;authpriv.none;cron.none   @10.128.0.7" >> /etc/rsyslog.conf && systemctl restart rsyslog.service
+#Important: this should be the internal not external IP of the server.
