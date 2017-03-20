@@ -144,14 +144,17 @@ openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
 cat /etc/ssl/certs/dhparam.pem | tee -a /etc/ssl/certs/apache-selfsigned.crt
 #modify /etc/httpd/conf.d/ssl.conf
 sleep 5
+
 cp /tmp/NTI-310/config_scripts/config.php /etc/phpldapadmin/config.php  
 sed -i -e "s/\/\/ \$servers->setValue('login','anon_bind',true);/\$servers->setValue('login','anon_bind',false);/" /etc/phpldapadmin/config.php
 
 sed -i 's/SLAPD_URLS="ldapi:\/\/\/ ldap:\/\/\/"/SLAPD_URLS=\"ldapi:\/\/\/ ldap:\/\/\/ ldaps:\/\/\/"/g' /etc/sysconfig/slapd
 sed -i 's,Require local,#Require local\n    Require all granted,g' /etc/httpd/conf.d/phpldapadmin.conf
+
 systemctl restart httpd
 systemctl restart slapd
 #allow firewall
+
 echo "configuring the firewall"
 firewall-cmd --permanent --add-port=636/tcp
 firewall-cmd --permanent --zone=public --add-service=http
