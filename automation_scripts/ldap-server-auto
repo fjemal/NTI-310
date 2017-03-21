@@ -143,7 +143,7 @@ echo "# LDIF Export for cn=mygroup,ou=People,dc=ldap,dc=local
 
 #ldapadd -x -D "cn=ldapadm,dc=ldap,local" -f mygroup.ldif -y /root/ldap_admin_pass
 
-cp /tmp/NTI-310/config_scripts/config.php /etc/phpldapadmin/config.php  
+#cp /tmp/NTI-310/config_scripts/config.php /etc/phpldapadmin/config.php  
 sed -i -e "s/\/\/ \$servers->setValue('login','anon_bind',true);/\$servers->setValue('login','anon_bind',false);/" /etc/phpldapadmin/config.php
 
 sed -i 's/SLAPD_URLS="ldapi:\/\/\/ ldap:\/\/\/"/SLAPD_URLS=\"ldapi:\/\/\/ ldap:\/\/\/ ldaps:\/\/\/"/g' /etc/sysconfig/slapd
