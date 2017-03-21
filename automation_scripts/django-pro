@@ -5,7 +5,7 @@
 #isntall pip, apache, and mod-wsgi
 sudo yum -y install python-pip httpd mod_wsgi
 
-echo "Starting HTTP service..."
+echo "Starting apache server..."
 sudo systemctl enable httpd.service
 
 echo "Starting Apache Server..."
@@ -20,12 +20,11 @@ git config --global user.email "fjemal01@seattlecentral.edu"
 #isntall current epel release
 sudo yum -y install epel-release
 
-echo "Beginning Django Web Framework install..."
 echo "Current version of Python:"
 
 python --version
 
-echo "Installing virtualenv to give Django it's own version of Python..."
+echo "Installing virtualenv"
 
 sudo yum -y install python-pip
 
@@ -42,11 +41,9 @@ sleep 5
 cd django
 sudo virtualenv django-env
 
-echo "Activating virtualenv..."
+echo "Activating ther django server..."
 
 source /opt/django/django-env/bin/activate
-
-echo "To switch out of virtualenv, type deactivate."
 
 echo "Now using this version of Python:"
 
@@ -81,10 +78,8 @@ deactivate
 
 #tell django to use apache and mod_wsgi, adjust permissions
 
-
-
 sudo cp /NTI-310/config_scripts/httpd.conf /etc/httpd/conf/httpd.conf
-sudo usermod -a -G Jonathan apache
+sudo usermod -a -G FJ apache
 sudo setenforce 0
 sudo systemctl restart httpd
 
