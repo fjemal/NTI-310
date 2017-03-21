@@ -53,7 +53,7 @@
 	
 
 	echo "Creating the ldap instance and running the install script..."
-	gcloud compute instances create ldap-server-test \
+	gcloud compute instances create ldap-server \
 	    --image-family centos-7 \
 	    --image-project centos-cloud \
 	    --machine-type f1-micro \
@@ -62,7 +62,7 @@
     
      echo "Creating the rsyslog server instance and running the install script..."
 
-         gcloud compute instances create rsyslog \
+         gcloud compute instances create rsyslog-server \
          --image-family centos-7 \
          --image-project centos-cloud \
          --machine-type f1-micro \
@@ -84,7 +84,7 @@ gcloud compute instances create  ubuntu-client1 \
     --image-project ubuntu-os-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/myldap-client \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/ubuntu-client \
 
 echo "Creating ubuntu-client-c instance and running the install scripts..."
 gcloud compute instances create ubuntu-client2 \
@@ -92,32 +92,32 @@ gcloud compute instances create ubuntu-client2 \
     --image-project ubuntu-os-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/myldap-client \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/ubuntu-client \
 
 
 echo "Creating the nfs-server and running the install script..."
-gcloud compute instances create postgres-a \
+gcloud compute instances create nfs-server \
     --image-family centos-7 \
     --image-project centos-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgresql-auto \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/nfs-server-auto \
 
 echo "Creating the postgres-a-test server and running the install script..."
-gcloud compute instances create postgres-b \
+gcloud compute instances create postgres-b-stage \
     --image-family centos-7 \
     --image-project centos-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgresql-auto \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgres-auto \
 
 echo "Creating the postgres-b-staging server and running the install script..."
-gcloud compute instances create postgres-c \
+gcloud compute instances create postgres-c-pro \
     --image-family centos-7 \
     --image-project centos-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgresql-auto \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgres-auto \
 
 echo "Creating the postgres-c-production server and running the install script..."
 gcloud compute instances create django-a \
@@ -128,7 +128,7 @@ gcloud compute instances create django-a \
     --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django \
 
 echo "Creating the django-a-test server and running the install script..."
-gcloud compute instances create django-b \
+gcloud compute instances create django-b-stage \
     --image-family centos-7 \
     --image-project centos-cloud \
     --machine-type f1-micro \
@@ -136,12 +136,12 @@ gcloud compute instances create django-b \
     --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django \
 
 echo "Creating the django-b-staging server and running the install script..."
-gcloud compute instances create django-c \
+gcloud compute instances create django-c-pro \
     --image-family centos-7 \
     --image-project centos-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django-pro \
 
 echo "Creating the django-c-production server and running the install script..."
 gcloud compute instances create django-c-production \
