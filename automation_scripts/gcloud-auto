@@ -149,9 +149,8 @@ gcloud compute instances create django-c-production \
     --image-project centos-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/Users/Jonathan/desktop/NTI310/NTI-310/automation_scripts/django-production-install.sh \
-
-echo "Jwade005's Google Cloud Final Project Automatic Installation Complete. :)
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django-pro 
+echo "FJ's GCloud Final Project Automatic Installation Complete. :)
 
 
 
