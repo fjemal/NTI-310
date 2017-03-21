@@ -84,7 +84,7 @@ gcloud compute instances create  ubuntu-client1 \
     --image-project ubuntu-os-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/ubuntu-client \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/nfs-client-auto \
 
 echo "Creating ubuntu-client-c instance and running the install scripts..."
 gcloud compute instances create ubuntu-client2 \
@@ -109,7 +109,7 @@ gcloud compute instances create postgres-b-stage \
     --image-project centos-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgres-auto \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgres.auto \
 
 echo "Creating the postgres-b-staging server and running the install script..."
 gcloud compute instances create postgres-c-pro \
@@ -117,7 +117,7 @@ gcloud compute instances create postgres-c-pro \
     --image-project centos-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgres-auto \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgres.auto \
 
 echo "Creating the postgres-c-production server and running the install script..."
 gcloud compute instances create django-a \
@@ -143,13 +143,6 @@ gcloud compute instances create django-c-pro \
     --scopes cloud-platform \
     --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django-pro \
 
-echo "Creating the django-c-production server and running the install script..."
-gcloud compute instances create django-c-production \
-    --image-family centos-7 \
-    --image-project centos-cloud \
-    --machine-type f1-micro \
-    --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django-pro 
 
 echo "FJ's GCloud Final Project Automatic Installation Complete. :)
 
