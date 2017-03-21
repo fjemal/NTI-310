@@ -5,11 +5,11 @@
 	
 
 	echo "Authorizing fjemal01 for this project..."
-	gcloud auth login fjemal01@seattlecentral.edu--no-launch-browser
+	gcloud auth login fjemal01@seattlecentral.edu --no-launch-browser
 	
 
 	echo "Enabling billing..."
-	gcloud alpha billing accounts projects link gocrazy-162200--account-id=006C0D-619A5B-A95AED
+	gcloud alpha billing accounts projects link gocrazy-162200 --account-id=006C0D-619A5B-A95AED
 	
 
 	echo "Setting admin account-id..."
