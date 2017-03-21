@@ -36,7 +36,7 @@ cd /opt
 # we want to make this env accessible to the GCloud user because we don't want to have to run it as root
 
 sudo mkdir django
-sudo chown -R django
+sudo chown -R fadil django
 sleep 5
 cd django
 sudo virtualenv django-env
