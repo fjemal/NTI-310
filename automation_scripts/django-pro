@@ -123,7 +123,7 @@ echo "from django.contrib.auth.models import User; User.objects.create_superuser
 
 #echo "from django.contrib.auth.models import User; User.objects.create_superuser('fjemal', 'fjemal01@seattlecentral.edu', 'P@ssw0rd1')" | python manage.py shell
 
-deactivate
+#deactivate
 
 #allow django to connect to the db on httpd <--- solves issue with django being able to reconnect to the db
 
