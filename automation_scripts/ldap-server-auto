@@ -123,7 +123,8 @@ ou: Group" > base.ldif
 ldapadd -x -W -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif -y /root/ldap_admin_pass
 #ldapadd -x -D "cn=ldapadm,dc=ldap,dc=local" -f base.ldif -y /root/ldap_admin_pass
 
-echo "# LDIF Export for cn=mygroup,ou=People,dc=ldap,dc=local
+ #ldapsearch -Q -Y EXTERNAL -H ldapi:/// -LLL -b cn=config olcDatabase=\* dn
+#echo "# LDIF Export for cn=mygroup,ou=People,dc=ldap,dc=local
 # Server: Local LDAP Server (127.0.0.1)
 # Search Scope: base
 # Search Filter: (objectClass=*)
