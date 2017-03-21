@@ -36,7 +36,7 @@ cd /opt
 # we want to make this env accessible to the GCloud user because we don't want to have to run it as root
 
 sudo mkdir django
-sudo chown -R fadil django
+sudo chown -R fadilj django
 sleep 5
 cd django
 sudo virtualenv django-env
@@ -48,7 +48,7 @@ source /opt/django/django-env/bin/activate
 echo "Now using this version of Python:"
 
 which python
-sudo chown -R /opt/django
+sudo chown -R fadilj /opt/django
 
 echo "Installing Django"
 
