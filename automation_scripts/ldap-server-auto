@@ -34,15 +34,8 @@ systemctl start httpd
 
 #setsebool -P httpd_can_connect_ldap on
 sed -i 's,Require local,#Require local\n    Require all granted,g' /etc/httpd/conf.d/phpldapadmin.conf
-# decent config guide: http://www.itzgeek.com/how-tos/linux/centos-how-tos/install-configure-phpldapadmin-centos-7-ubuntu-16-04.html
-#Note: LDAP comes up completely insecure, with Anonymous login enabled by default... this is not a good and happy thing, so fix 
-#it in the config file
-#(prompt for user input), the following is currently a manual config, but could be automated fairly easily
- 
-echo "phpldapadmin is now up and running"
-echo "configuring ldap and ldapamdin"
 
-#echo "generating ldap slappasswrd"
+echo "generating slappasswrd"
 
 newsecret=$(slappasswd -g)
 newhash=$(slappasswd -s "$newsecret")
@@ -80,10 +73,6 @@ ldapmodify -Y EXTERNAL  -H ldapi:/// -f monitor.ldif
 
 openssl req -new -x509 -nodes -out /etc/openldap/certs/fjldapcert.pem -keyout /etc/openldap/certs/fjldapkey.pem -days 365 -subj "/C=US/ST=WA/L=Seattle/O=IT/OU=NTI310/CN=ldap.local"
 chown -R ldap /etc/openldap/certs/fj*.pem
-#chown -R ldap. /etc/openldap/certs/fjldapkey.pem
-#cp /tmp/NTI-310/config_scripts/certs.ldif /etc/openldap/slapd.d/certs.ldif
-#ldapmodify -Y EXTERNAL  -H ldapi:/// -f /etc/openldap/slapd.d/certs.ldif
-# Test cert configuration
 
 echo "dn: cn=config
 changetype: modify
@@ -162,6 +151,26 @@ cp /tmp/NTI-310/config_scripts/config.php /etc/phpldapadmin/config.php
 sed -i -e "s/\/\/ \$servers->setValue('login','anon_bind',true);/\$servers->setValue('login','anon_bind',false);/" /etc/phpldapadmin/config.php
 sed -i 's/SLAPD_URLS="ldapi:\/\/\/ ldap:\/\/\/"/SLAPD_URLS=\"ldapi:\/\/\/ ldap:\/\/\/ ldaps:\/\/\/"/g' /etc/sysconfig/slapd
 sed -i 's,Require local,#Require local\n    Require all granted,g' /etc/httpd/conf.d/phpldapadmin.conf
+
+echo '# Begin copied text \
+# from https://cipherli.st/ \
+# and https://raymii.org/s/tutorials/Strong_SSL_Security_On_Apache2.html \
+SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH \
+SSLProtocol All -SSLv2 -SSLv3 \
+SSLHonorCipherOrder On \
+# Disable preloading HSTS for now.  You can use the commented out header line that includes \
+# the \"preload\" directive if you understand the implications. \
+#Header always set Strict-Transport-Security \"max-age=63072000; includeSubdomains; preload\" \
+Header always set Strict-Transport-Security \"max-age=63072000; includeSubdomains\" \
+Header always set X-Frame-Options DENY \
+Header always set X-Content-Type-Options nosniff \
+# Requires Apache >= 2.4 \
+SSLCompression off \
+SSLUseStapling on \
+SSLStaplingCache \"shmcb:logs/stapling-cache(150000)\" \
+# Requires Apache >= 2.4.11 \
+# SSLSessionTickets Off' >> /etc/httpd/conf.d/ssl.conf
+
 
 systemctl restart httpd
 systemctl restart slapd
