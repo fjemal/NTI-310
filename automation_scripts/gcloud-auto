@@ -150,6 +150,7 @@ gcloud compute instances create django-c-production \
     --machine-type f1-micro \
     --scopes cloud-platform \
     --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django-pro 
+
 echo "FJ's GCloud Final Project Automatic Installation Complete. :)
 
 
