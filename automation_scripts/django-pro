@@ -5,7 +5,7 @@
 #isntall pip, apache, and mod-wsgi
 sudo yum -y install python-pip httpd mod_wsgi
 
-echo "Starting apache server..."
+echo "enabling apache server..."
 sudo systemctl enable httpd.service
 
 echo "Starting Apache Server..."
