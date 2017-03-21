@@ -139,9 +139,10 @@ dn: cn=mygroup,ou=People,dc=ldap,dc=local
 cn: mygroup
 gidnumber: 500
 objectclass: posixGroup
-objectclass: top" >> groups.ldif
+objectclass: top
+" > mygroup.ldif
 
-ldapadd -x -D "cn=ldapadm,dc=ldap,local" -f group.ldif -y /root/ldap_admin_pass
+ldapadd -x -D "cn=ldapadm,dc=ldap,local" -f mygroup.ldif -y /root/ldap_admin_pass
 
 
 #allow firewall
