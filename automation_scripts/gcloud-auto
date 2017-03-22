@@ -76,7 +76,7 @@ gcloud compute instances create ubuntu-client-a \
     --image-project ubuntu-os-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/myldap-client \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/ldap-client-auto \
 
 echo "Creating ubuntu-client-b instance and running the install scripts..."
 gcloud compute instances create  ubuntu-client1 \
@@ -117,9 +117,9 @@ gcloud compute instances create django-server \
     --image-project centos-cloud \
     --machine-type f1-micro \
     --scopes cloud-platform \
-    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django \
+    --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/django 
 
-echo "FJ's GCloud Final Project Automatic Installation Complete. :)
+
 
 
 
