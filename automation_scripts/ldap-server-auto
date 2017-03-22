@@ -32,7 +32,7 @@ yum -y install httpd
 systemctl enable httpd
 systemctl start httpd
 
-#setsebool -P httpd_can_connect_ldap on
+setsebool -P httpd_can_connect_ldap on
 sed -i 's,Require local,#Require local\n    Require all granted,g' /etc/httpd/conf.d/phpldapadmin.conf
 
 echo "generating slappasswrd"
