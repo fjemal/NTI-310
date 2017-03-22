@@ -16,10 +16,10 @@ systemctl start nfs-idmap
 
 #make directories and ownership
 mkdir /var/dev
-chown nfs:nfs /var/dev
+chown mynfs:mynfs /var/dev
 chmod -R 777 /var/dev
 mkdir /var/config
-chown nfs:nfs /var/config
+chown mynfs:mynfs /var/config
 chmod -R 777 /var/config
 
 # use internal IPs
