@@ -74,13 +74,6 @@ echo 'STATIC_ROOT = os.path.join(BASE_DIR, "static/")' >> /opt/django/project1/p
 
 sudo yum -y install tree
 tree project1
-
-cd /opt/django/project1
-/opt/django/django-env/bin/python manage.py makemigrations
-/opt/django/django-env/bin/python manage.py migrate
-echo yes | /opt/django/django-env/bin/python manage.py collectstatic
-#echo "starting django server"
-deactivate
 #sudo chmod 644 /opt/django/project1/manage.py
 #sudo setenforce 0
 sudo cp /NTI-310/config_scripts/httpd.conf /etc/httpd/conf/httpd.conf
