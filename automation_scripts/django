@@ -77,9 +77,9 @@ echo yes | /opt/django/django-env/bin/python manage.py collectstatic
 #sudo setenforce 0
 deactivate
 
-#sudo cp /NTI-310/config_scripts/httpd.conf /etc/httpd/conf/httpd.conf
+sudo cp /NTI-310/config_scripts/httpd.conf /etc/httpd/conf/httpd.conf
 
-sudo usermod -a -G fadilj apache
+#sudo usermod -a -G fadilj apache
 
 sudo setenforce 0
 
