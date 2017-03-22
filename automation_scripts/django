@@ -70,7 +70,7 @@ django-admin startproject project1
 
 echo "Adjusting settings.py allowed_hosts..."
 sed -i "s,ALLOWED_HOSTS = \[\],ALLOWED_HOSTS = \['*'\],g" /opt/django/project1/project1/settings.py
-echo 'STATIC_ROOT = os.path.join(BASE_DIR, "static/")' >> /opt/django/project1/project1/settings.py
+#echo 'STATIC_ROOT = os.path.join(BASE_DIR, "static/")' >> /opt/django/project1/project1/settings.py
 
 sudo yum -y install tree
 tree project1
@@ -78,7 +78,7 @@ tree project1
 cd /opt/django/project1
 /opt/django/django-env/bin/python manage.py makemigrations
 /opt/django/django-env/bin/python manage.py migrate
-echo yes | /opt/django/django-env/bin/python manage.py collectstatic
+echo yes | /opt/django/django-env/bin/python manage.py 
 #echo "starting django server"
 deactivate
 #sudo chmod 644 /opt/django/project1/manage.py
@@ -89,7 +89,7 @@ sudo setenforce 0
 sudo systemctl restart httpd
 echo "Django is to accessible from port 8000"
 
-ip1=$(gcloud compute instances list | grep postgres-server | awk '{print $4}')
+#ip1=$(gcloud compute instances list | grep postgres-server | awk '{print $4}')
 
 sed -i "s/        'ENGINE': 'django.db.backends.sqlite3',/        'ENGINE': 'django.db.backends.postgresql_psycopg2',/g" /opt/django/project1/project1/settings.py
 sed -i "s/        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),/        'NAME': 'project1',/g" /opt/django/project1/project1/settings.py
@@ -99,7 +99,7 @@ sed -i "82i 'HOST': '10.128.0.9'," /opt/django/project1/project1/settings.py
 sed -i "83i 'PORT': '5432'," /opt/django/project1/project1/settings.py
 sed -i "s/'USER': 'project1',/        'USER': 'project1',/g" /opt/django/project1/project1/settings.py
 sed -i "s/'PASSWORD': 'P@ssw0rd1',/        'PASSWORD': 'P@ssw0rd1',/g" /opt/django/project1/project1/settings.py
-sed -i "s/'HOST': 'IP',/        'HOST': 'ip1',/g" /opt/django/project1/project1/settings.py
+sed -i "s/'HOST': '10.128.0.9',/        'HOST': '10.128.0.9',/g" /opt/django/project1/project1/settings.py
 sed -i "s/'PORT': '5432',/        'PORT': '5432',/g" /opt/django/project1/project1/settings.py
 
 echo "activating django"
