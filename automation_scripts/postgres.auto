@@ -1,9 +1,9 @@
 #!/bin/bash
 
-yum -y update
-sudo yum -y install epel-release-7
-sudo yum -y install postgresql-server postgresql-contrib
-
+sudo yum -y install httpd
+sudo systemctl enable httpd
+sudo systemctl start httpd#yum -y update
+#sudo yum -y install postgresql-server postgresql-contrib
 echo "installing git"
 yum -y install git
 #service postgresql initdb
@@ -14,28 +14,34 @@ git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
 git config --global user.name "fjemal"
 git config --global user.email "fjemal01@seattlecentral.edu"
 
+sudo yum -y install epel-release
+
+sudo yum install python-pip python-devel gcc postgresql-server postgresql-devel postgresql-contrib
+
 sudo postgresql-setup initdb
+sudo systemctl start postgresql
 
-sudo yum -y install httpd
-sudo systemctl enable httpd
-sudo systemctl start httpd
+sudo sed -i "s/ident/md5/g" /var/lib/pgsql/data/pg_hba.conf
 
-systemctl enable postgresql
-systemctl start postgresql
+sudo sed -i -e "\$ahost    all             all             0.0.0.0/0      md5" /var/lib/pgsql/data/pg_hba.conf
+
+sudo systemctl restart postgresql
+sudo systemctl enable postgresql
+
+sudo -i -u postgres psql -U postgres -f /var/lib/pgsql/postgres.sql
+sudo cp /tmp/NTI-310/config_scripts/postgres.sql /var/lib/pgsql/postgres.sql
+
+
 
 echo "adusting the firewall"
 firewall-cmd --permanent --add-port=5432/tcp
 firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --reload
 
-sudo cp /tmp/NTI-310/config_scripts/postgres.sql /var/lib/pgsql/postgres.sql
-sudo -i -u postgres psql -U postgres -f /var/lib/pgsql/postgres.sql
 
 sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /var/lib/pgsql/data/postgresql.conf
 
-sudo sed -i "s/ident/md5/g" /var/lib/pgsql/data/pg_hba.conf
 
-sudo sed -i -e "\$ahost    all             all             0.0.0.0/0      md5" /var/lib/pgsql/data/pg_hba.conf
 
 #Run the following command to make PostgreSQL work if SELinux enabled on your system.
 setsebool -P httpd_can_network_connect_db 1
