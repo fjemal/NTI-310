@@ -20,14 +20,6 @@ python --version
 
 echo "installing virtualenv so we can give django its own version of python"
 
-# here you can install with updates or without updates.  To install python pip with a full kernel upgrade (not somthing you would do in prod, but
-# definately somthing you might do to your testing or staging server: sudo yum update
-
-# for a prod install (no update)
-
-# this adds the noarch release reposatory from the fedora project, wich contains python pip
-# python pip is a package manager for python...
-
 sudo rpm -iUvh https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm
 
 sudo yum -y install python-pip
@@ -61,7 +53,6 @@ echo "installing django"
  
 pip install django
 
-
 echo "django admin is version:"
 
 django-admin --version
@@ -69,20 +60,32 @@ django-admin --version
 django-admin startproject project1
 
 echo "Adjusting settings.py allowed_hosts..."
-sed -i "s,ALLOWED_HOSTS = \[\],ALLOWED_HOSTS = \['*'\],g" /opt/django/project1/project1/settings.py
+
+sed -i "s,ALLOWED_HOSTS = \[\],ALLOWED_HOSTS = \['*'\],g" /opt/django/project1/project1/settings.py\
+
 echo 'STATIC_ROOT = os.path.join(BASE_DIR, "static/")' >> /opt/django/project1/project1/settings.py
 
 sudo yum -y install tree
 tree project1
+
+cd /opt/django/project1
+/opt/django/django-env/bin/python manage.py makemigrations
+/opt/django/django-env/bin/python manage.py migrate
+echo yes | /opt/django/django-env/bin/python manage.py collectstatic
 #sudo chmod 644 /opt/django/project1/manage.py
 #sudo setenforce 0
+deactivate
+
 sudo cp /NTI-310/config_scripts/httpd.conf /etc/httpd/conf/httpd.conf
+
 sudo usermod -a -G fadilj apache
+
 sudo setenforce 0
+
 sudo systemctl restart httpd
 echo "Django is to accessible from port 8000"
 
-#ip1=$(gcloud compute instances list | grep postgres-server | awk '{print $4}')
+ip1=$(gcloud compute instances list | grep postgres-server | awk '{print $4}')
 
 sed -i "s/        'ENGINE': 'django.db.backends.sqlite3',/        'ENGINE': 'django.db.backends.postgresql_psycopg2',/g" /opt/django/project1/project1/settings.py
 sed -i "s/        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),/        'NAME': 'project1',/g" /opt/django/project1/project1/settings.py
@@ -92,7 +95,7 @@ sed -i "82i 'HOST': '10.128.0.9'," /opt/django/project1/project1/settings.py
 sed -i "83i 'PORT': '5432'," /opt/django/project1/project1/settings.py
 sed -i "s/'USER': 'project1',/        'USER': 'project1',/g" /opt/django/project1/project1/settings.py
 sed -i "s/'PASSWORD': 'P@ssw0rd1',/        'PASSWORD': 'P@ssw0rd1',/g" /opt/django/project1/project1/settings.py
-sed -i "s/'HOST': '10.128.0.9',/        'HOST': '10.128.0.9',/g" /opt/django/project1/project1/settings.py
+sed -i "s/'HOST': 'IP',/        'HOST': 'ip1',/g" /opt/django/project1/project1/settings.py
 sed -i "s/'PORT': '5432',/        'PORT': '5432',/g" /opt/django/project1/project1/settings.py
 
 echo "activating django"
@@ -113,41 +116,6 @@ deactivate
 sudo setsebool -P httpd_can_network_connect_db on
 sudo systemctl restart httpd
 
-#mkdir ~/project1
-#cd ~/project1
-#virtualenv myprojectenv
-#source myprojectenv/bin/activate
-
-
-#django-admin.py startproject project1 .
-#edit the following files~/project1/project1/settings.py
-
-#DATABASES = {
- #   'default': {
-  #      'ENGINE': 'django.db.backends.postgresql_psycopg2',
-   #     'NAME': 'project1',
-    #    'USER': 'myprojectuser',
-     #   'PASSWORD': 'password',
-      #  'HOST': 'localhost',
-       # 'PORT': '',
-    #}
-#}
-#configure django database settings
-#sed -i "s/        'ENGINE': 'django.db.backends.sqlite3',/        'ENGINE': 'django.db.backends.postgresql_psycopg2',/g" /opt/django/project1/project1/settings.py
-#sed -i "s/       'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),/        'NAME': 'project1',/g" /opt/django/project1/project1/settings.py
-#sed  i "78a\       'USER': 'projectuser'," /opt/django/project1/project1/settings.py
-#sed -i "79a\       'PASSWORD': 'P@ssw0rd1'," /opt/django/project1/project1/settings.py
-#sed -i "80a\       'HOST': '10.128.0.9'," /opt/django/project1/project1/settings.py
-#sed -i "81a\       'PORT': '5432'," /opt/django/project1/project1/settings.py
-
-#cd /opt/django/project1
-#python manage.py makemigrations
-#python manage.py migrate
-
-#python manage.py createsuperuser
-
-#you can delete the existing superuser and creat yoursso this is valid for every build: 
-#echo "from django.contrib.auth.models import User; User.objects.filter(email=fjemal01@seattlecentral.edu').delete(); User.objects.create_superuser('admin@example.com', 'admin', 'nimda')" | python manage.py shell
 
 python manage.py runserver 0.0.0.0:8000&
 #for disallowed host error edit project1/settings.py and add the django ip to ALLOWED_HOST
