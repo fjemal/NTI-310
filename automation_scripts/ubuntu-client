@@ -15,7 +15,7 @@ git config --global user.email "fjemal01@seattlecentral.edu"
 cp /tmp/NTI-310/config_scripts/ldap.conf /etc/ldap.conf
 
 #configure ldap client
-ip=$(gcloud compute instances list | grep ldap-server | awk '{print $4}')
+ip=$(gcloud compute instances list | grep ldap-server-auto | awk '{print $4}')
 #use sed to add config lines to /etc/ldap.conf
 sed -i 's,base dc=example\,dc=net,base dc=ldap\,dc=local,g' /etc/ldap.conf
 sed -i 's,uri ldapi:///,uri ldap://10.128.0.5/,g' /etc/ldap.conf
