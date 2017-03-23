@@ -1,9 +1,13 @@
 #!/bin/bash
 
 sudo apt-get update
-sudo apt-get -y install libnss-ldap libpam-ldap ldap-utils nscd nslcd
+apt-get --yes update && apt-get --yes upgrade && apt-get --yes dist-upgrade
+
 #set the ubuntu environment variables DEBIAN_FRONTEND TO noninteractive
 export DEBIAN_FRONTEND=noninteractive
+
+sudo apt-get -y install libnss-ldap libpam-ldap ldap-utils nscd nslcd debconf-utils
+
 unset DEBIAN_FRONTEND
 
 #echo "cloning fjemal01's NTI-310 GitHub..."
