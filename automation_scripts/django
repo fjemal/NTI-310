@@ -24,6 +24,8 @@ sudo rpm -iUvh https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9
 
 sudo yum -y install python-pip
 
+sudo yum -y install python-pip httpd mod_wsgi
+
 # Now we're installing virtualenv, which will allow us to create a python installation and environment, just for our Django server
 sudo pip install virtualenv
 
