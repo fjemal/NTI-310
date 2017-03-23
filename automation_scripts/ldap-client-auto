@@ -1,6 +1,5 @@
-#This is ldap-client automation script
-#Install the necessary LDAP client packages.
-#update the client server
+#!/bin/bash
+
 sudo apt-get update
 sudo apt-get -y install libnss-ldap libpam-ldap ldap-utils nscd nslcd
 #set the ubuntu environment variables DEBIAN_FRONTEND TO noninteractive
@@ -20,9 +19,7 @@ cp /tmp/NTI-310/config_scripts/ldap.conf /etc/ldap.conf
 sed -i 's,base dc=example\,dc=net,base dc=ldap\,dc=local,g' /etc/ldap.conf
 sed -i 's,uri ldapi:///,uri ldap://10.128.0.5/,g' /etc/ldap.conf
 sed -i -e "s/pam_password md5/pam_password ssha/" /etc/ldap.conf
-sed -i 's,rootbinddn cn=ldapadm\,dc=example\,dc=net,#rootbinddn cn=manager\,dc=example\,dc=net,g' /etc/ldap.conf
-sed -i 's,ldap_version 3,g' /etc/ldap.conf
-sed -i 's,pam_password md5,g' /etc/ldap.conf
+sed -i 's,rootbinddn cn=manager\,dc=example\,dc=net,#rootbinddn cn=manager\,dc=example\,dc=net,g' /etc/ldap.conf
 #ldap://Server-IP-address #change lpdapi:/// to ldap:// 
 #use ldap version 3
 # dc=ldap,dc=local
@@ -31,11 +28,6 @@ sed -i 's,pam_password md5,g' /etc/ldap.conf
 
 #Configure authentication:
 # /etc/nsswitch.conf
-#
-# Example configuration of GNU Name Service Switch functionality.
-# If you have the `glibc-doc-reference' and `info' packages installed, try:
-# `info libc "Name Service Switch"' for information about this file.
-
 # vi /etc/nsswitch.conf  >>>>>>>>>>user stream edetor "sed"
 
 sed -i 's,passwd:         compat,passwd:         ldap compat,g' /etc/nsswitch.conf
@@ -65,38 +57,9 @@ sed -i 's,shadow:         compat,shadow:         ldap compat,g' /etc/nsswitch.co
 sed -i '$ a\session required    pam_mkhomedir.so skel=/etc/skel umask=0077' /etc/pam.d/common-session
 #restart the service
 /etc/init.d/nscd restart
-#[ ok ] Restarting nscd (via systemctl): nscd.service.
-#edit the sudoers
-# This file MUST be edited with the 'visudo' command as root.
-#
-# Please consider adding local content in /etc/sudoers.d/ instead$
-# directly modifying this file.
-#
-# See the man page for details on how to write a sudoers file.
-#
-#Defaults        env_reset
-#Defaults        mail_badpass
-#Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/$
 
-# Host alias specification
-
-# User alias specification
-
-# Cmnd alias specification
-
-# User privilege specification
-#root    ALL=(ALL:ALL) ALL
-
-# Members of the admin group may gain root privileges
 sed -i 's/%admin=(ALL) ALL/#%admin ALL=(ALL) ALL/g' /etc/sudoers                                        #  <<<<<<<<<comment out
 
-# Allow members of group sudo to execute any command
-#%sudo   ALL=(ALL:ALL) ALL
-
-# See sudoers(5) for more information on "#include" directives:
-
-#includedir /etc/sudoers.d
-#edit sshd config
 cd /etc/ssh
 #if permission denied cp sshd_config sshd_config.bak
 #vi sshd_config
