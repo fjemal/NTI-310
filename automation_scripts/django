@@ -107,9 +107,11 @@ sudo yum -y install gcc
 
 pip install psycopg2
 
-#cd /opt/django/project1
-#python manage.py migrate
-#cd /opt/django/project1
+cd /opt/django/project1
+python manage.py makemigrations
+python manage.py migrate
+
+cd /opt/django/project1
 
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('fjemal', 'fjemal01@seattlecentral.edu', 'P@ssw0rd1')" | python manage.py shell
 
