@@ -32,7 +32,7 @@ cd /opt
 # we want to make this env accisible to the ec2-user at first, because we don't want to have to run it as root.
 
 sudo mkdir django
-sudo chown -R fadilj django
+sudo chown -R fjemal django
 
 sleep 5
 
@@ -48,7 +48,7 @@ echo "to switch out of virtualenv, type deactivate"
 
 which python
 
-sudo chown -R fadilj /opt/django
+sudo chown -R fjemal /opt/django
 
 echo "installing django"
  
