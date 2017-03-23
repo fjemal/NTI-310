@@ -60,14 +60,15 @@ django-admin --version
 
 django-admin startproject project1
 
+sudo yum -y install tree
+tree project1
+
+
 echo "Adjusting settings.py allowed_hosts..."
 
 sed -i "s,ALLOWED_HOSTS = \[\],ALLOWED_HOSTS = \['*'\],g" /opt/django/project1/project1/settings.py\
 
 echo 'STATIC_ROOT = os.path.join(BASE_DIR, "static/")' >> /opt/django/project1/project1/settings.py
-
-sudo yum -y install tree
-tree project1
 
 cd /opt/django/project1
 /opt/django/django-env/bin/python manage.py makemigrations
@@ -99,7 +100,7 @@ sed -i "s/'PASSWORD': 'P@ssw0rd1',/        'PASSWORD': 'P@ssw0rd1',/g" /opt/djan
 sed -i "s/'HOST': 'IP',/        'HOST': 'ip1',/g" /opt/django/project1/project1/settings.py
 sed -i "s/'PORT': '5432',/        'PORT': '5432',/g" /opt/django/project1/project1/settings.py
 
-echo "activating django"
+#echo "activating django"
 source /opt/django/django-env/bin/activate
 sudo yum -y install python-devel postgresql-devel
 sudo yum -y install gcc
