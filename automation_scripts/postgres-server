@@ -1,0 +1,92 @@
+#!/bin/bash
+
+sudo yum -y install httpd
+sudo systemctl enable httpd
+sudo systemctl start httpd#yum -y update
+#sudo yum -y install postgresql-server postgresql-contrib
+echo "installing git"
+yum -y install git
+#service postgresql initdb
+#start postgresql service and make it to start automatically on every reboot.
+
+echo "cloning fjemal's NTI-Github..."
+git clone https://github.com/fjemal/NTI-310.git /tmp/NTI-310
+git config --global user.name "fjemal"
+git config --global user.email "fjemal01@seattlecentral.edu"
+
+sudo yum -y install epel-release
+
+sudo yum install python-pip python-devel gcc postgresql-server postgresql-devel postgresql-contrib
+
+sudo postgresql-setup initdb
+sudo systemctl start postgresql
+
+sudo sed -i "s/ident/md5/g" /var/lib/pgsql/data/pg_hba.conf
+
+sudo sed -i -e "\$ahost    all             all             0.0.0.0/0      md5" /var/lib/pgsql/data/pg_hba.conf
+
+sudo systemctl restart postgresql
+sudo systemctl enable postgresql
+
+sudo -i -u postgres psql -U postgres -f /var/lib/pgsql/postgres.sql
+sudo cp /tmp/NTI-310/config_scripts/postgres.sql /var/lib/pgsql/postgres.sql
+
+
+
+echo "adusting the firewall"
+firewall-cmd --permanent --add-port=5432/tcp
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --reload
+
+
+sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" /var/lib/pgsql/data/postgresql.conf
+
+
+
+#Run the following command to make PostgreSQL work if SELinux enabled on your system.
+setsebool -P httpd_can_network_connect_db 1
+
+#echo "cloning fjemal01's NTI-310 GitHub..."
+sudo -i -u postgres pg_ctl reload
+
+#echo "Current python version:"
+#echo "updating the server"
+#sudo yum -y update
+#echo "installing postgres"
+#sudo yum install postgresql-server postgresql-contrib
+
+
+#Edit /var/lib/pgsql/data/postgresql.conf and configure PostgreSQL to listen on localhost:
+#sudo vim /var/lib/pgsql/data/postgresql.conf
+#Set the following parameter:
+
+#listen_addresses = 'localhost'
+
+#or execute the following command
+
+#sudo sed -i 's/^#listen_addresses /listen_addresses/' /var/lib/pgsql/data/postgresql.conf
+#sudo sed -i 's/\(host  *all  *all  *0.0.0.0\/0  *\)ident/\1md5/' /var/lib/pgsql/data/pg_hba.conf
+#sudo sed -i 's/\(host  *all  *all  *0.0.0.0\/0  *\)ident/\1md5/' /var/lib/pgsql/data/pg_hba.conf
+
+
+#sudo -i -u postgres
+# log into postgres account
+#You can get a Postgres prompt immediately by typing:
+#psql
+#Exit out of the PostgreSQL prompt
+#\q
+
+
+yum -y install phpPgAdmin httpd
+
+sudo cp /tmp/NTI-310/config_scripts/config.inc.php /etc/phpPgAdmin/config.inc.php
+
+sed -i 's,  Require local,  Require all granted,g' /etc/httpd/conf.d/phpPgAdmin.conf
+
+
+#sudo setsebool -P httpd_can_network_connect_db on
+sudo sed -i "s/#port = 5432/port = 5432/g" /var/lib/pgsql/data/postgresql.conf
+sudo systemctl start postgresql
+
+sudo systemctl restart httpd
+echo "point browser to <serverIPaddress>/phpPgAdmin and login using postgres or project1 user to login."
