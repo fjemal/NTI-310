@@ -44,7 +44,7 @@
 	    --allow tcp:443
 	
 
-	gcloud compute firewall-rules create allow-django --description "Django test server connection allowed." \
+	gcloud compute firewall-rules create allow-django --description "Django connection allowed." \
 	    --allow tcp:8000
 	
 
@@ -52,7 +52,7 @@
 	    --allow tcp:21
 	
 
-	echo "Creating the ldap instance and running the install script..."
+	echo "Creating the rsyslog server instance and running the install script..."
 	gcloud compute instances create rsyslog-server \
 	    --image-family centos-7 \
 	    --image-project centos-cloud \
@@ -60,7 +60,7 @@
 	    --scopes cloud-platform \
 	   --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/rsyslog-auto \
     
-     echo "Creating the rsyslog server instance and running the install script..."
+     echo "Creating the ldap server instance and running the install script..."
 
          gcloud compute instances create ldap-server \
          --image-family centos-7 \
@@ -70,7 +70,7 @@
         --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/ldap-server-auto \
 
 
-echo "Creating ubuntu-client-a instance and running the install scripts..."
+echo "Creating ldap-client instance and running the install scripts..."
 gcloud compute instances create ubuntu-ldap-client \
     --image-family ubuntu-1604-lts \
     --image-project ubuntu-os-cloud \
@@ -78,7 +78,7 @@ gcloud compute instances create ubuntu-ldap-client \
     --scopes cloud-platform \
     --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/ldap-client-auto \
 
-echo "Creating ubuntu-client-b instance and running the install scripts..."
+echo "Creating nfs client instance and running the install scripts..."
 gcloud compute instances create  ubuntu-nfs-client \
     --image-family ubuntu-1604-lts \
     --image-project ubuntu-os-cloud \
@@ -86,7 +86,7 @@ gcloud compute instances create  ubuntu-nfs-client \
     --scopes cloud-platform \
     --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/nfs-client-auto \
 
-echo "Creating ubuntu-client-c instance and running the install scripts..."
+echo "Creating rsyslog client instance and running the install scripts..."
 gcloud compute instances create ubuntu-rsyslog-client \
     --image-family ubuntu-1604-lts \
     --image-project ubuntu-os-cloud \
@@ -95,7 +95,7 @@ gcloud compute instances create ubuntu-rsyslog-client \
     --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/rsyslog-client \
 
 
-echo "Creating the nfs-server and running the install script..."
+echo "Creating the nfs server and running the install script..."
 gcloud compute instances create nfs-server \
     --image-family centos-7 \
     --image-project centos-cloud \
@@ -103,7 +103,7 @@ gcloud compute instances create nfs-server \
     --scopes cloud-platform \
     --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/nfs-server-auto \
 
-echo "Creating the postgres-a-test server and running the install script..."
+echo "Creating the postgres server and running the install script..."
 gcloud compute instances create postgres \
     --image-family centos-7 \
     --image-project centos-cloud \
@@ -111,7 +111,7 @@ gcloud compute instances create postgres \
     --scopes cloud-platform \
     --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgres-server \
 
-echo "Creating the postgres-b-staging server and running the install script..."
+echo "Creating the postgres server and running the install script..."
 gcloud compute instances create django-server \
     --image-family centos-7 \
     --image-project centos-cloud \
