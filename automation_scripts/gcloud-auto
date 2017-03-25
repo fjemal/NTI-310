@@ -111,7 +111,7 @@ gcloud compute instances create postgres \
     --scopes cloud-platform \
     --metadata-from-file startup-script=/tmp1/NTI-310/automation_scripts/postgres-server \
 
-echo "Creating the postgres server and running the install script..."
+echo "Creating the django server and running the install script..."
 gcloud compute instances create django-server \
     --image-family centos-7 \
     --image-project centos-cloud \
