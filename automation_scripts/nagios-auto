@@ -103,7 +103,8 @@ systemctl status nrpe.service
 service httpd start 
 service nagios start
 
-#sudo vi /usr/local/nagios/etc/servers/nfs-server.cfg
+#sudo vi /usr/local/nagios/etc/servers/nfs.cfg
+mkdir /usr/local/nagios/etc/servers
 echo "define host {
         use                             linux-server
         host_name                       nfs
@@ -170,7 +171,7 @@ define service{
         check_command            check_nrpe!check_mem
 }
 
-"> /usr/local/nagios/etc/servers
+"> /usr/local/nagios/etc/servers/nfs.cfg
  echo '# check_nrpe command definition
 define command{
         command_name check_nrpe
