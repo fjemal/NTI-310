@@ -103,4 +103,84 @@ systemctl status nrpe.service
 service httpd start 
 service nagios start
 
+#sudo vi /usr/local/nagios/etc/servers/nfs-server.cfg
+echo "define host {
+        use                             linux-server
+        host_name                       nfs
+        alias                           nfs
+        address                        10.128.0.11
+        max_check_attempts              5
+        check_period                    24x7
+        notification_interval           30
+        notification_period             24x7
+}
+
+#Ping:
+
+define service {
+        use                             generic-service
+        host_name                       nfs
+        service_description             PING
+        check_command                   check_ping!100.0,20%!500.0,60%
+}
+
+define service {
+        use                             generic-service
+        host_name                       nfs
+        service_description             HTTP
+        check_command                   check_http
+        notifications_enabled           0
+}
+
+#SSH (notifications_enabled set to 0 disables notifications for a service):
+
+define service {
+        use                             generic-service
+        host_name                       nfs
+        service_description             SSH
+        check_command                   check_ssh
+        notifications_enabled           0
+        define service{
+        use                     generic-service      
+        host_name               nfs
+        service_description     Current Users
+        check_command		check_nrpe!check_users!20!50
+        }
+
+#Proccess service check
+define service{
+        use                     generic-service        
+        host_name               nfs
+        service_description     Total Processes
+        check_command	        check_nrpe!check_procs!250!400!RSZDT
+        }
+
+#Load Balance service check
+define service{
+        use                      generic-service        
+        host_name                nfs
+        service_description      Current Load
+        check_command	         check_nrpe!check_load!5.0,4.0,3.0!10.0,6.0,4.0
+        }
+#Memory RAM service check
+define service{
+        use                      generic-service
+        host_name                nfs
+        service_description      Check RAM
+        check_command            check_nrpe!check_mem
+}
+
+"> /usr/local/nagios/etc/servers
+ echo '# check_nrpe command definition
+define command{
+        command_name check_nrpe
+        command_line $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+}
+"> /usr/local/nagios/objects/commands.cfg
+sed -i "s,command[check_hda1]=/usr/lib64/nagios/plugins/check_disk -w 20% -c 10% -p /dev/hda1,command[check_disk]=/usr/lib64/nagios/plugins/check_disk -w 20% -c 10% -p /dev/sda1,g" /etc/nagios/nrpe.cfg
+#sed -i "215i command[check_disk]=\/usr\/lib64\/nagios\/plugins\/check_disk -w 20% -c 10% -p \/dev\/sda1" /etc/nagios/nrpe.cfg
+sed -i "216i command[check_procs]=\/usr\/lib64\/nagios\/plugins\/check_procs -w 150 -c 200" /etc/nagios/nrpe.cfg
+sed -i "217i command[check_mem]=/usr/lib64/nagios/plugins/check_mem  -f -w 20 -c 10" /etc/nagios/nrpe.cfg
+#echo "command[check_mem]=/usr/lib64/nagios/plugins/check_mem.sh -w 80 -c 90" >> /etc/nagios/nrpe.cfg
+
 
