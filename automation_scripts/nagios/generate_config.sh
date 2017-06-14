@@ -10,8 +10,7 @@ fi
 host="$1"
 ip="$2"
 
-echo "
-# Host Definition
+echo "# Host Definition
 define host {
     use         linux-server        ; Inherit default values from a template
     host_name   $host               ; The name we're giving to this host
